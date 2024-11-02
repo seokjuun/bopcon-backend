@@ -23,7 +23,7 @@ public class AddNewConcertRequest {
     private String countryCode; // ex) Kr
     private String ticketPlatforms;
     private String ticketUrl;
-    private String imageUrl; // 포스터
+    private String posterUrl; // 포스터
     private String genre;
     private NewConcert.ConcertStatus concertStatus;
 
@@ -39,7 +39,7 @@ public class AddNewConcertRequest {
                 .countryCode(countryCode)
                 .ticketPlatforms(ticketPlatforms)
                 .ticketUrl(ticketUrl)
-                .imageUrl(imageUrl)
+                .posterUrl(posterUrl)
                 .genre(genre)
                 .concertStatus(concertStatus)
                 .build();

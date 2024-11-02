@@ -50,8 +50,8 @@ public class NewConcert {
 
     @Column(name = "ticket_url", length = 255)
     private String ticketUrl;
-    @Column(name = "image_url", length = 255)
-    private String imageUrl; // 포스터
+    @Column(name = "poster_url", length = 255)
+    private String posterUrl; // 포스터
     @Column(name = "genre", length = 50)
     private String genre;
 
@@ -68,7 +68,7 @@ public class NewConcert {
     public NewConcert(Artist artistId, String title, String subTitle, LocalDate date,
                       String venueName, String cityName, String countryName,
                       String countryCode, String ticketPlatforms, String ticketUrl,
-                      String imageUrl, String genre, ConcertStatus concertStatus){
+                      String posterUrl, String genre, ConcertStatus concertStatus){
         this.artistId = artistId;
         this.title = title;
         this.subTitle = subTitle;
@@ -79,7 +79,7 @@ public class NewConcert {
         this.countryCode = countryCode;
         this.ticketPlatforms = ticketPlatforms;
         this.ticketUrl = ticketUrl;
-        this.imageUrl = imageUrl;
+        this.posterUrl = posterUrl;
         this.genre = genre;
         this.concertStatus = concertStatus;
     }
@@ -95,7 +95,7 @@ public class NewConcert {
         this.countryCode = newConcert.getCountryCode();
         this.ticketPlatforms = newConcert.getTicketPlatforms();
         this.ticketUrl = newConcert.getTicketUrl();
-        this.imageUrl = newConcert.getImageUrl();
+        this.posterUrl = newConcert.getPosterUrl();
         this.genre = newConcert.getGenre();
         this.concertStatus = newConcert.getConcertStatus();
     }
