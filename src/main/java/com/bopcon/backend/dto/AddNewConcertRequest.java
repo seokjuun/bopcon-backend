@@ -1,7 +1,8 @@
 package com.bopcon.backend.dto;
 
-
-import com.bopcon.backend.domain.Concert;
+import com.bopcon.backend.domain.Artist;
+import com.bopcon.backend.domain.NewConcert;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,32 +12,36 @@ import java.time.LocalDate;
 @NoArgsConstructor // 기본 생성자 추가
 @AllArgsConstructor // 모든 필드 값을 파라미터로 받는 생성자 추가
 @Getter
-public class AddConcertRequest {
+public class AddNewConcertRequest {
+    private Artist artistId;
     private String title;
     private String subTitle;
     private LocalDate date;
-    private String location; // 공연장
-    private String city;
-    private String country; // ex) Republic of Korea
+    private String venueName; // 공연장
+    private String cityName;
+    private String countryName; // ex) Republic of Korea
     private String countryCode; // ex) Kr
+    private String ticketPlatforms;
     private String ticketUrl;
     private String imageUrl; // 포스터
     private String genre;
-    private Concert.ConcertType concertType;
+    private NewConcert.ConcertStatus concertStatus;
 
-    public Concert toEntity(){
-        return Concert.builder()
+    public NewConcert toNewConcert() {
+        return NewConcert.builder()
+                .artistId(artistId)
                 .title(title)
                 .subTitle(subTitle)
                 .date(date)
-                .location(location)
-                .city(city)
-                .country(country)
+                .venueName(venueName)
+                .cityName(cityName)
+                .countryName(countryName)
                 .countryCode(countryCode)
+                .ticketPlatforms(ticketPlatforms)
                 .ticketUrl(ticketUrl)
                 .imageUrl(imageUrl)
                 .genre(genre)
-                .concertType(concertType)
+                .concertStatus(concertStatus)
                 .build();
     }
 }
