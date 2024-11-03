@@ -9,6 +9,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 
 
 @RequiredArgsConstructor
@@ -30,8 +31,13 @@ public class NewConcertService {
         newConcert.updateNewConcert(request);
         return newConcert;
     }
+
+    // 콘서트 목록 가져오기
+    public List<NewConcert> findAllNewConcerts(){ return newConcertRepository.findAll(); }
+
+    // 콘서트 (장르 필터) 목록 가져오기
+    public List<NewConcert> findNewConcertsByGenre(String genre){
+        return newConcertRepository.findByGenre(genre);
+    }
+
 }
-// request.getArtistId(), request.getTitle(), request.getSubTitle(), request.getDate(),
-//                request.getVenueName(), request.getCityName(), request.getCountryName(), request.getCountryCode(),
-//                request.getTicketPlatforms(), request.getTicketUrl(), request.getPosterUrl(),
-//                request.getGenre(), request.getConcertStatus()
