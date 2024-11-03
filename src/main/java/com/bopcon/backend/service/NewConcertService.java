@@ -45,4 +45,9 @@ public class NewConcertService {
                 .orElseThrow(()-> new IllegalArgumentException("not found: "+ concertId));
     }
 
+    // 콘서트 삭제
+    public void delete(long concertId){
+        newConcertRepository.deleteById(concertId);
+    }
+
 }

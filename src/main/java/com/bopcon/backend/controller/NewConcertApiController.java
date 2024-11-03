@@ -59,4 +59,13 @@ public class NewConcertApiController {
         NewConcert newConcert = newConcertService.findByConcertId(concertId);
         return ResponseEntity.ok().body(new NewConcertResponse(newConcert));
     }
+
+
+    // 새 콘서트 삭제
+    @DeleteMapping("/api/concerts/{concertId}")
+    public ResponseEntity<Void> deleteNewConcert(@PathVariable long concertId){
+        newConcertService.delete(concertId);
+
+        return ResponseEntity.ok().build(); //Http 응답 생성, build()는 본문이 없는 응답 생성
+    }
 }
