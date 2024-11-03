@@ -39,5 +39,10 @@ public class NewConcertService {
     public List<NewConcert> findNewConcertsByGenre(String genre){
         return newConcertRepository.findByGenre(genre);
     }
+    // 콘서트 조회
+    public NewConcert findByConcertId(long concertId){
+        return newConcertRepository.findById(concertId)
+                .orElseThrow(()-> new IllegalArgumentException("not found: "+ concertId));
+    }
 
 }

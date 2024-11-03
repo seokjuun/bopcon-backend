@@ -51,4 +51,12 @@ public class NewConcertApiController {
                 .body(newConcerts);
         // GET 요청이 오면 findAll() 메서드를 호출 후 응답용 객체인 ArticleResponse 로 파싱해 body 에 담아 클라이언트에 전송
     }
+
+    // 새 콘서트 정보 조회
+    @GetMapping("/api/concerts/{concertId}")
+    public ResponseEntity<NewConcertResponse> findNewConcert(@PathVariable long concertId)
+    {
+        NewConcert newConcert = newConcertService.findByConcertId(concertId);
+        return ResponseEntity.ok().body(new NewConcertResponse(newConcert));
+    }
 }
