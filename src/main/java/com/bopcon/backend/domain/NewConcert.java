@@ -1,6 +1,7 @@
 package com.bopcon.backend.domain;
 
 
+import com.bopcon.backend.dto.UpdateNewConcertRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -84,19 +85,19 @@ public class NewConcert {
         this.concertStatus = concertStatus;
     }
     // 뉴콘서트 정보 수정 메서드
-    public void updateNewConcert(NewConcert newConcert){
-        this.artistId = newConcert.getArtistId();
-        this.title = newConcert.getTitle();
-        this.subTitle = newConcert.getSubTitle();
-        this.date = newConcert.getDate();
-        this.venueName = newConcert.getVenueName();
-        this.cityName = newConcert.getCityName();
-        this.countryName = newConcert.getCountryName();
-        this.countryCode = newConcert.getCountryCode();
-        this.ticketPlatforms = newConcert.getTicketPlatforms();
-        this.ticketUrl = newConcert.getTicketUrl();
-        this.posterUrl = newConcert.getPosterUrl();
-        this.genre = newConcert.getGenre();
-        this.concertStatus = newConcert.getConcertStatus();
+    public void updateNewConcert(UpdateNewConcertRequest request) {
+        this.artistId = request.getArtistId();
+        this.title = request.getTitle();
+        this.subTitle = request.getSubTitle();
+        this.date = request.getDate();
+        this.venueName = request.getVenueName();
+        this.cityName = request.getCityName();
+        this.countryName = request.getCountryName();
+        this.countryCode = request.getCountryCode();
+        this.ticketPlatforms = request.getTicketPlatforms();
+        this.ticketUrl = request.getTicketUrl();
+        this.posterUrl = request.getPosterUrl();
+        this.genre = request.getGenre();
+        this.concertStatus = request.getConcertStatus();
     }
 }
