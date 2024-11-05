@@ -1,10 +1,13 @@
 package com.bopcon.backend.service;
 
 
+import com.bopcon.backend.domain.Artist;
 import com.bopcon.backend.domain.NewConcert;
 import com.bopcon.backend.dto.AddNewConcertRequest;
 import com.bopcon.backend.dto.UpdateNewConcertRequest;
+import com.bopcon.backend.repository.ArtistRepository;
 import com.bopcon.backend.repository.NewConcertRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,10 +19,13 @@ import java.util.List;
 @Service
 public class NewConcertService {
     private final NewConcertRepository newConcertRepository;
+    private final ArtistRepository artistRepository;
 
     // 뉴 콘서트 추가 메서드
     public NewConcert save(AddNewConcertRequest request) {
-        return newConcertRepository.save(request.toNewConcert());
+        Artist artist = artistRepository.findById(request.getArtistId())
+                .orElseThrow(()-> new EntityNotFoundException("Artist not found"));
+        return newConcertRepository.save(request.toNewConcert(artist));
     }
 
     // 뉴 콘서트 수정

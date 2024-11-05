@@ -17,7 +17,7 @@ public class AddArtistRequest {
     private String mediaUrl;
 
     // DTO 를 엔티티(Artist 타입 객체)로
-    public Artist toEntity() {
+    public Artist toArtist() {
         return Artist.builder()
                 .mbid(mbid)
                 .name(name)

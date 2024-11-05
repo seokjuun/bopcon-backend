@@ -26,14 +26,14 @@ public class NewConcertApiController {
     }
 
     // 수정
-    @PutMapping("/api/admin/update-new-concert/{concertId}")
+    @PutMapping("/api/admin/new-concert/{concertId}")
     public ResponseEntity<NewConcert> updateNewConcert(@PathVariable long concertId, @RequestBody UpdateNewConcertRequest request){
         NewConcert updateNewconcert = newConcertService.update(concertId, request);
         return ResponseEntity.ok().body(updateNewconcert); //응답 값은 body 에 담아 전송
     }
 
     // 새 콘서트 전체 조회, 장르별로 필터링 가능
-    @GetMapping("/api/new-concerts")
+    @GetMapping("/api/new-concerts")  // /api/new-concerts?genre={장르}
     public ResponseEntity<List<NewConcertResponse>> findAllNewConcerts(@RequestParam(required = false) String genre) {
         List<NewConcertResponse> newConcerts;
         if(genre != null){
@@ -53,7 +53,7 @@ public class NewConcertApiController {
     }
 
     // 새 콘서트 정보 조회
-    @GetMapping("/api/concerts/{concertId}")
+    @GetMapping("/api/new-concerts/{concertId}")
     public ResponseEntity<NewConcertResponse> findNewConcert(@PathVariable long concertId)
     {
         NewConcert newConcert = newConcertService.findByConcertId(concertId);
@@ -62,7 +62,7 @@ public class NewConcertApiController {
 
 
     // 새 콘서트 삭제
-    @DeleteMapping("/api/concerts/{concertId}")
+    @DeleteMapping("/api/admin/new-concerts/{concertId}")
     public ResponseEntity<Void> deleteNewConcert(@PathVariable long concertId){
         newConcertService.delete(concertId);
 
