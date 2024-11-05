@@ -1,13 +1,144 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>BOBCON</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artist and Concert Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        section {
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
-    <p>안녕</p>
+<h1>Artist and Concert Management</h1>
+
+<!-- Artist Management Section -->
+<section>
+    <h2>Add Artist</h2>
+    <form id="add-artist-form">
+        <input type="text" id="artist-mbid" placeholder="MBID" required>
+        <input type="text" id="artist-name" placeholder="Name" required>
+        <input type="text" id="artist-imgUrl" placeholder="Image URL">
+        <input type="text" id="artist-snsUrl" placeholder="SNS URL">
+        <input type="text" id="artist-mediaUrl" placeholder="Media URL">
+        <button type="submit">Add Artist</button>
+    </form>
+</section>
+
+<section>
+    <h2>All Artists</h2>
+    <button onclick="getAllArtists()">Get All Artists</button>
+    <ul id="artist-list"></ul>
+</section>
+
+<!-- Concert Management Section -->
+<section>
+    <h2>Add Concert</h2>
+    <form id="add-concert-form">
+        <input type="number" id="concert-artistId" placeholder="Artist ID" required>
+        <input type="text" id="concert-title" placeholder="Title" required>
+        <input type="text" id="concert-subTitle" placeholder="Sub Title">
+        <input type="date" id="concert-date" required>
+        <input type="text" id="concert-venueName" placeholder="Venue Name" required>
+        <input type="text" id="concert-cityName" placeholder="City Name" required>
+        <input type="text" id="concert-countryName" placeholder="Country Name" required>
+        <input type="text" id="concert-countryCode" placeholder="Country Code" required>
+        <input type="text" id="concert-ticketPlatforms" placeholder="Ticket Platforms">
+        <input type="url" id="concert-ticketUrl" placeholder="Ticket URL">
+        <input type="url" id="concert-posterUrl" placeholder="Poster URL">
+        <input type="text" id="concert-genre" placeholder="Genre" required>
+        <select id="concert-status" required>
+            <option value="UPCOMING">UPCOMING</option>
+            <option value="COMPLETED">COMPLETED</option>
+        </select>
+        <button type="submit">Add Concert</button>
+    </form>
+</section>
+
+<section>
+    <h2>All Concerts</h2>
+    <button onclick="getAllConcerts()">Get All Concerts</button>
+    <ul id="concert-list"></ul>
+</section>
+
+<script>
+    // Add Artist
+    document.getElementById('add-artist-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const artistData = {
+            mbid: document.getElementById('artist-mbid').value,
+            name: document.getElementById('artist-name').value,
+            imgUrl: document.getElementById('artist-imgUrl').value,
+            snsUrl: document.getElementById('artist-snsUrl').value,
+            mediaUrl: document.getElementById('artist-mediaUrl').value
+        };
+        fetch('/api/admin/artist', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(artistData)
+        }).then(response => response.json())
+            .then(data => alert(`Artist Added: ${data.name}`));
+    });
+
+    // Get All Artists
+    function getAllArtists() {
+        fetch('/api/artists')
+            .then(response => response.json())
+            .then(data => {
+                const artistList = document.getElementById('artist-list');
+                artistList.innerHTML = '';
+                data.forEach(artist => {
+                    const li = document.createElement('li');
+                    li.textContent = `ID: ${artist.artistId}, MBID: ${artist.mbid}, Name: ${artist.name}`;
+                    artistList.appendChild(li);
+                });
+            });
+    }
+
+    // Add Concert
+    document.getElementById('add-concert-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const concertData = {
+            artistId: parseInt(document.getElementById('concert-artistId').value),
+            title: document.getElementById('concert-title').value,
+            subTitle: document.getElementById('concert-subTitle').value,
+            date: document.getElementById('concert-date').value,
+            venueName: document.getElementById('concert-venueName').value,
+            cityName: document.getElementById('concert-cityName').value,
+            countryName: document.getElementById('concert-countryName').value,
+            countryCode: document.getElementById('concert-countryCode').value,
+            ticketPlatforms: document.getElementById('concert-ticketPlatforms').value,
+            ticketUrl: document.getElementById('concert-ticketUrl').value,
+            posterUrl: document.getElementById('concert-posterUrl').value,
+            genre: document.getElementById('concert-genre').value,
+            concertStatus: document.getElementById('concert-status').value
+        };
+        fetch('/api/admin/new-concert', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(concertData)
+        }).then(response => response.json())
+            .then(data => alert(`Concert Added: ${data.title}`));
+    });
+
+    // Get All Concerts
+    function getAllConcerts() {
+        fetch('/api/new-concerts')
+            .then(response => response.json())
+            .then(data => {
+                const concertList = document.getElementById('concert-list');
+                concertList.innerHTML = '';
+                data.forEach(concert => {
+                    const li = document.createElement('li');
+                    li.textContent = `Concert ID: ${concert.newConcertId}, Artist ID: ${concert.artistId}, Title: ${concert.title}`;
+                    concertList.appendChild(li);
+                });
+            });
+    }
+</script>
 </body>
 </html>
