@@ -2,8 +2,10 @@ package com.bopcon.backend.service;
 
 import com.bopcon.backend.domain.Artist;
 import com.bopcon.backend.dto.AddArtistRequest;
+import com.bopcon.backend.dto.UpdateArtistRequest;
 import com.bopcon.backend.repository.ArtistRepository;
 import com.bopcon.backend.repository.NewConcertRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,5 +26,15 @@ public class ArtistService {
     public Artist findByArtistId(long artistId){
         return artistRepository.findById(artistId)
                 .orElseThrow(()-> new IllegalArgumentException("not found" + artistId));
+    }
+
+    // 아시트스 수정
+    @Transactional
+    public Artist update(long artistId, UpdateArtistRequest request) {
+        Artist artist = artistRepository.findById(artistId)
+                .orElseThrow(()-> new IllegalArgumentException("not found" + artistId));
+
+        artist.updateArtist(request);
+        return artist;
     }
 }

@@ -4,8 +4,10 @@ import com.bopcon.backend.domain.Artist;
 import com.bopcon.backend.domain.NewConcert;
 import com.bopcon.backend.dto.AddArtistRequest;
 import com.bopcon.backend.dto.ArtistResponse;
+import com.bopcon.backend.dto.UpdateArtistRequest;
 import com.bopcon.backend.service.ArtistService;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.sql.Update;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +40,16 @@ public class ArtistApiController {
         Artist artist = artistService.findByArtistId(artistId);
         return ResponseEntity.ok().body(new ArtistResponse(artist));
     }
+
+    // 아티스트 수정
+    @PutMapping("/api/admin/artists/{artistId}")
+    public ResponseEntity<Artist> updateArtist(@PathVariable long artistId, @RequestBody UpdateArtistRequest request) {
+        Artist updateArtist = artistService.update(artistId, request);
+        return ResponseEntity.ok().body(updateArtist);
+    }
+
+
+
 
 
 }
