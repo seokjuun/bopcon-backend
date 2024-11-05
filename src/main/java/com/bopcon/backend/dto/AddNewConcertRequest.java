@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @AllArgsConstructor // 모든 필드 값을 파라미터로 받는 생성자 추가
 @Getter
 public class AddNewConcertRequest {
-    private Artist artistId;
+    private Long artistId;
     private String title;
     private String subTitle;
     private LocalDate date;
@@ -27,9 +27,9 @@ public class AddNewConcertRequest {
     private String genre;
     private NewConcert.ConcertStatus concertStatus;
 
-    public NewConcert toNewConcert() {
+    public NewConcert toNewConcert(Artist artist) {
         return NewConcert.builder()
-                .artistId(artistId)
+                .artistId(artist)
                 .title(title)
                 .subTitle(subTitle)
                 .date(date)

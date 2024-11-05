@@ -48,7 +48,13 @@ public class ArtistApiController {
         return ResponseEntity.ok().body(updateArtist);
     }
 
+    // 아티스트 삭제
+    @DeleteMapping("/api/artists/{artistId}")
+    public ResponseEntity<Void> deleteArtist(@PathVariable long artistId) {
+        artistService.delete(artistId);
 
+        return ResponseEntity.ok().build(); // build() 본문이 없는 응답 생성
+    }
 
 
 

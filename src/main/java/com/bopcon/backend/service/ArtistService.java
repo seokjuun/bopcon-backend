@@ -37,4 +37,9 @@ public class ArtistService {
         artist.updateArtist(request);
         return artist;
     }
+
+    // 아티스트 삭제
+    public void delete(long artistId){
+        artistRepository.deleteById(artistId);
+    }
 }
