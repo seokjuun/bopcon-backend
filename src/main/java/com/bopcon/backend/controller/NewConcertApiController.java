@@ -62,7 +62,7 @@ public class NewConcertApiController {
 
 
     // 새 콘서트 삭제
-    @DeleteMapping("/api/new-concerts/{concertId}")
+    @DeleteMapping("/api/admin/new-concerts/{concertId}")
     public ResponseEntity<Void> deleteNewConcert(@PathVariable long concertId){
         newConcertService.delete(concertId);
 
