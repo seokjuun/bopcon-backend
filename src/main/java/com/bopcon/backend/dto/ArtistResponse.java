@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 public class ArtistResponse {
-
+    private final Long artistId;
     private final String mbid;
     private final String name;
     private final String imgUrl;
@@ -14,6 +14,7 @@ public class ArtistResponse {
     private final String mediaUrl;
 
     public ArtistResponse(Artist artist){
+        this.artistId = artist.getArtistId();
         this.mbid = artist.getMbid();
         this.name = artist.getName();
         this.imgUrl = artist.getImgUrl();

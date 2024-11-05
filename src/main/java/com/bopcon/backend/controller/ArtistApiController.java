@@ -55,7 +55,4 @@ public class ArtistApiController {
 
         return ResponseEntity.ok().build(); // build() 본문이 없는 응답 생성
     }
-
-
-
 }
