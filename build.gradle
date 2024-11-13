@@ -38,6 +38,9 @@ dependencies {
 
     // 테스트 관련
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // 레디스
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 }
 
 

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 public class AuthController {
 
     private final UserService userService;
@@ -42,3 +43,23 @@ public class AuthController {
         }
     }
 }
+
+
+// 클라이언트에서 로그아웃
+
+// 로그아웃 함수 정의
+//function logout() {
+//    // 로컬 스토리지에서 토큰 삭제
+//    localStorage.removeItem("accessToken");
+//    localStorage.removeItem("refreshToken");
+//
+//    // 세션 스토리지를 사용하는 경우에도 동일하게 삭제
+//    // sessionStorage.removeItem("accessToken");
+//    // sessionStorage.removeItem("refreshToken");
+//
+//    // 로그아웃 후 리다이렉트
+//    window.location.href = "/login";  // 로그인 페이지로 리다이렉트
+//}
+//
+//// 로그아웃 버튼 클릭 시 함수 호출
+//document.getElementById("logoutButton").addEventListener("click", logout);

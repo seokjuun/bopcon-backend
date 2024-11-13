@@ -11,6 +11,7 @@ import java.time.LocalDate;
 public class NewConcertResponse {
     private final Long newConcertId;
     private final Long artistId;
+    private final String artistName;
     private final String title;
     private final String subTitle;
     private final LocalDate date;
@@ -27,6 +28,7 @@ public class NewConcertResponse {
     public NewConcertResponse(NewConcert newConcert){
         this.newConcertId = newConcert.getNewConcertId();
         this.artistId = newConcert.getArtistId().getArtistId(); // 처음 get 은 아티스트 객체를 가져오고 두번째는 아이드를 가져옴
+        this.artistName = newConcert.getArtistId().getName();
         this.title = newConcert.getTitle();
         this.subTitle = newConcert.getSubTitle();
         this.date = newConcert.getDate();
