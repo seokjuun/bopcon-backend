@@ -1,5 +1,6 @@
 package com.bopcon.backend.domain;
 
+import com.bopcon.backend.dto.UpdateArtistRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -39,7 +40,7 @@ public class Artist {
     }
 
     // 수정 메서드
-    public void updateArtist(Artist artist) {
+    public void updateArtist(UpdateArtistRequest artist) {
         this.mbid = artist.getMbid();
         this.name = artist.getName();
         this.imgUrl = artist.getImgUrl();
