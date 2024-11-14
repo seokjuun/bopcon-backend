@@ -24,7 +24,12 @@ import static org.springframework.boot.autoconfigure.security.servlet.PathReques
 @EnableWebSecurity // 스프링 시큐리티 활성화
 @RequiredArgsConstructor // final 로 선언된 필드에 대해 생성자 자동 생성
 public class WebSecurityConfig {
-
+    private final TokenProvider tokenProvider;
+    // TokenAuthenticationFilter 빈 생성
+    @Bean
+    public TokenAuthenticationFilter tokenAuthenticationFilter() {
+        return new TokenAuthenticationFilter(tokenProvider); // TokenProvider를 주입하여 필터 생성
+    }
 
     private final UserDetailService userService;
 
@@ -44,14 +49,18 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                .authorizeRequests(auth -> auth // 3. 인증, 인가 설정
-
-                        .anyRequest().permitAll()) // anyRequest() : 위에서 설정한거 외의 요청에 대해 설정, authenticated(): 별도의 인가는 필요없지만 인증 성공 상태여야 접근가능
-
-                .csrf(AbstractHttpConfigurer::disable) // 6. csrf 비활성화 (활성화하는게 좋음)
-                // csrf : 사이트 간 요청 위조
+                .csrf(AbstractHttpConfigurer::disable) // CSRF 비활성화 (SPA와 JWT 사용 시 비활성화가 일반적)
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // JWT 인증 사용으로 세션 미사용
+                .authorizeRequests(auth -> auth
+                        .requestMatchers("/api/auth/signup", "/api/auth/login").permitAll() // 회원가입, 로그인은 인증 없이 접근 가능
+                        .requestMatchers("/api/artists/**", "/api/new-concerts/**").permitAll()
+                        .anyRequest().authenticated() // 나머지 요청은 인증된 사용자만 접근 가능
+                )
+                .addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class) // JWT 인증 필터 추가
                 .build();
     }
+
 
     // 7. 인증 관리자 관련 설정
     // 사용자 정보를 가져올 서비스를 재정의 하거나, 인증 방법, 예를 들어 LDAP, JDBC 기반 인증 등을 설정할 때 사용
