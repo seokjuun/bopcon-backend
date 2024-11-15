@@ -8,6 +8,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @EntityListeners(AuditingEntityListener.class) // 엔티티의 생성 및 수정 시간을 자동으로 감시하고 기록
 @Entity
 @Getter
@@ -29,6 +32,10 @@ public class Artist {
     private String snsUrl;
     @Column(name = "media_url")
     private String mediaUrl;
+
+    @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Favorite> favorites = new ArrayList<>();
+
 
     @Builder // 빌더 패턴으로 객체 생성
     public Artist(String mbid, String name, String imgUrl, String snsUrl, String mediaUrl) {
