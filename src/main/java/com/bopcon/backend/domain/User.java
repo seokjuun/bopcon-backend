@@ -48,6 +48,14 @@ public class User implements UserDetails {
         this.nickname = nickname;
     }
 
+    // 새로운 생성자 추가
+    public User(Long id, String email, String password, Collection<? extends GrantedAuthority> authorities) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+    }
+
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
