@@ -48,7 +48,7 @@ class ArtistApiControllerTest {
         @Test
         public void addArtist() throws Exception {
             // given
-            final String url = "/api/admin/artists";
+            final String url = "/api/admin/artist";
             final String mbid = "mbid-123";
             final String name = "artist_name";
             final String imgUrl = "http://image.com";

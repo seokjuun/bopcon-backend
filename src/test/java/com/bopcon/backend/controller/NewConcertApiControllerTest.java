@@ -66,7 +66,7 @@ class NewConcertApiControllerTest {
         final NewConcert.ConcertStatus concertStatus = NewConcert.ConcertStatus.valueOf("UPCOMING");
 
         final AddNewConcertRequest userRequest = new AddNewConcertRequest(
-                artistId, title, subTitle, date, venueName, cityName, countryName,
+                artistId.getArtistId(), title, subTitle, date, venueName, cityName, countryName,
                 countryCode, ticketPlatforms, ticketUrl, posterUrl, genre, concertStatus);
 
         final String requestBody = objectMapper.writeValueAsString(userRequest); // dto 객체 만들고 json 으로 직렬화 시킴
