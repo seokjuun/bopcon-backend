@@ -6,6 +6,8 @@ import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,14 +17,13 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 @RequiredArgsConstructor
 @Service
 // TokenProvider : JWT 토큰을 생성하고, 검증. 토큰을 통해 인증 정보를 추출.
 public class TokenProvider {
     private final JwtProperties jwtProperties; // 필요한 설정 정보 불러옴.
-    private static final Logger log = LoggerFactory.getLogger(TokenProvider.class);
+
 
     // JWT 토큰을 생성하기 위한 메서드
     public String generateToken(User user, Duration expiredAt) { // 유저정보, 토큰 만료 기간 매개변수
@@ -49,15 +50,15 @@ public class TokenProvider {
 
     // 2. JWT 토큰 유효성 검증 메서드 : 유효여부를 boolean 타입으로 변환, 프로퍼티즈 파일에 선언한 비밀값과 함께 토큰 복호화
     public boolean validToken(String token) {
-        log.info("Validating token: {}", token);
+
         try {
             Jwts.parser()
                     .setSigningKey(jwtProperties.getSecretKey())
                     .parseClaimsJws(token);
-            log.info("Token is valid");
+
             return true;
         } catch (Exception e) {
-            log.error("Invalid token: {}", e.getMessage());
+
             return false;
         }
     }
