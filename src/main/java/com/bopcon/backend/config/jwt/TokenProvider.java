@@ -6,6 +6,8 @@ import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -47,28 +49,46 @@ public class TokenProvider {
     }
 
     // 2. JWT 토큰 유효성 검증 메서드 : 유효여부를 boolean 타입으로 변환, 프로퍼티즈 파일에 선언한 비밀값과 함께 토큰 복호화
-    public boolean validToken(String token) { // 검증할 JWT 토큰을 매개변수로
-        try{
-            Jwts.parser() // JWT 파서 생성
-                    .setSigningKey(jwtProperties.getSecretKey()) // 비밀값으로 복호화 : 서명을 검증할 수 있도록 함
-                    .parseClaimsJws(token); // 전달된 토큰을 파싱하여 유효성을 확인.
+    public boolean validToken(String token) {
+
+        try {
+            Jwts.parser()
+                    .setSigningKey(jwtProperties.getSecretKey())
+                    .parseClaimsJws(token);
+
             return true;
-        } catch (Exception e){ // 복호화 과정에서 에러가 나면 유효하지 않은 토큰
+        } catch (Exception e) {
+
             return false;
         }
     }
 
     // 3. 토큰 기반으로 인증 정보를 가져오는 메서드 : 토큰을 기반으로 Authentication 객체를 생성
     // Authentication 객체를 반환하여 스프링 시큐리티에서 인증을 처리할 수 있게 함
-    public Authentication getAuthentication(String token) { // 인증 정보를 추출할 토큰 매개변수
-        Claims claims = getClaims(token); // 토큰의 클레임 정보를 가져옴, 여기 들어있는 토큰 제목 sub 와 토큰 기반으로 인증 정보를 생성
-        // 기본적으로  ROLE_USER 권한을 가진 인증 정보를 생성
-        Set<SimpleGrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"));
-        // 스프링 시큐리티의 인증 토큰 객체를 생성하여 반환. 이때, UserDetails 객체와 토큰, 권한을 함께 설정.
-        return new UsernamePasswordAuthenticationToken(new org.springframework.
-                security.core.userdetails.User(claims.getSubject(),
-                "",authorities),token, authorities); // User 는 스프링 시큐리티에서 제공하는 객체인 User 클래스
+//    public Authentication getAuthentication(String token) {
+//        log.info("Extracting authentication for token: {}", token);
+//        Claims claims = getClaims(token);
+//        log.info("Extracted claims: {}", claims);
+//        return new UsernamePasswordAuthenticationToken(
+//                new org.springframework.security.core.userdetails.User(
+//                        claims.getSubject(), "", Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))
+//                ), token, Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")));
+//    }
+    // TokenProvider에서 Authentication 반환
+    public Authentication getAuthentication(String token) {
+        Claims claims = getClaims(token);
+        return new UsernamePasswordAuthenticationToken(
+                new User(
+                        claims.get("id", Long.class), // ID
+                        claims.getSubject(), // 이메일
+                        "", // 패스워드
+                        Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))
+                ),
+                token,
+                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))
+        );
     }
+
 
     // 4. 토큰 기반으로 유저 ID를 가져오는 메서드 : 토큰을 복호화한 후 클레임 정보를 반환받고 클레임에서 id 키로 저장된 값을 가져와 반환
     public Long getUserId(String token) { // 유저 ID를 추출할 JWT 토큰

@@ -53,10 +53,13 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable) // CSRF 비활성화 (SPA와 JWT 사용 시 비활성화가 일반적)
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // JWT 인증 사용으로 세션 미사용
+//                .authorizeRequests(auth -> auth
+//                        .requestMatchers("/api/auth/signup", "/api/auth/login").permitAll() // 회원가입, 로그인은 인증 없이 접근 가능
+//                        .requestMatchers("/api/artists/**", "/api/new-concerts/**").permitAll()
+//                        .anyRequest().authenticated() // 나머지 요청은 인증된 사용자만 접근 가능
+//                )
                 .authorizeRequests(auth -> auth
-                        .requestMatchers("/api/auth/signup", "/api/auth/login").permitAll() // 회원가입, 로그인은 인증 없이 접근 가능
-                        .requestMatchers("/api/artists/**", "/api/new-concerts/**").permitAll()
-                        .anyRequest().authenticated() // 나머지 요청은 인증된 사용자만 접근 가능
+                        .anyRequest().permitAll() // 모든 요청 허용
                 )
                 .addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class) // JWT 인증 필터 추가
                 .build();
