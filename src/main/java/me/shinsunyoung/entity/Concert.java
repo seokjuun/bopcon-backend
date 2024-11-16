@@ -10,7 +10,7 @@ public class Concert {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long concert_id;
 
     private String date;
     private String venue;
@@ -30,11 +30,11 @@ public class Concert {
 
     // Getters and Setters
     public Long getId() {
-        return id;
+        return concert_id;
     }
 
     public void setId(Long id) {
-        this.id = id;
+        this.concert_id = id;
     }
 
     public String getDate() {
