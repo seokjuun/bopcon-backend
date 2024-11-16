@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Setlist</title>
+</head>
+<body>
+<h1>Concert Setlist</h1>
+
+<table>
+    <thead>
+    <tr>
+        <th>Artist</th>
+        <th>Date</th>
+        <th>Venue</th>
+        <th>City</th>
+        <th>Setlist</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="concert : ${setlist}">
+        <td th:text="${concert.artistName}">Artist</td>
+        <td th:text="${concert.date}">Date</td>
+        <td th:text="${concert.venue}">Venue</td>
+        <td th:text="${concert.city}">City</td>
+        <td th:text="${concert.setlist}">Setlist</td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

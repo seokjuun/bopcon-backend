@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>콘서트 셋리스트</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            text-align: center;
+        }
+        table {
+            width: 50%;
+            margin: auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            font-weight: bold;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+<h1>셋리스트</h1>
+<table>
+    <thead>
+    <tr>
+        <th>번호</th>
+        <th>곡 이름</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="song, iterStat : ${songs}">
+        <td th:text="${iterStat.count}">01</td> <!-- 곡 순서 번호 -->
+        <td th:text="${song.title}">Song name</td> <!-- 곡 제목 -->
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
