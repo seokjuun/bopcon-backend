@@ -32,7 +32,7 @@ public class UserApiController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    // 로그아웃 엔드포인트 (JWT 환경)
+    // 로그아웃 엔드포인트 (JWT 환경)    구현 x
     @PostMapping("/api/auth/logout")
     public ResponseEntity<String> logout() {
         // 클라이언트에서 JWT 토큰 삭제를 처리하고, 서버는 로그아웃 성공 응답만 반환
