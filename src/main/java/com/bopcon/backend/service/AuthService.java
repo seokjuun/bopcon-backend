@@ -40,6 +40,7 @@ public class AuthService {
         token.update(refreshToken);
         refreshTokenRepository.save(token);
 
-        return new LoginResponse(accessToken, refreshToken);
+//        return new LoginResponse(accessToken, refreshToken);
+        return new LoginResponse(accessToken, refreshToken, user.getNickname());
     }
 }
