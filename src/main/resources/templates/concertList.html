@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>콘서트 목록</title>
+</head>
+<body>
+<h1>콘서트 목록</h1>
+<table border="1">
+    <thead>
+    <tr>
+        <th>번호</th>
+        <th>가수</th>
+        <th>공연 날짜</th>
+        <th>공연 장소</th>
+        <th>상세보기</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="concert, iter : ${concerts}">
+        <td th:text="${iter.index + 1}"></td>
+        <td th:text="${concert.artist.name}"></td>
+        <td th:text="${concert.eventDate}"></td>
+        <td th:text="${concert.venue.name + ', ' + concert.venue.city.name}"></td>
+        <td>
+            <a th:href="@{/concerts/{id}(id=${iter.index + 1})}">보기</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

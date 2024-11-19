@@ -1,54 +1,55 @@
 package me.shinsunyoung.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SetlistDTO {
-    private String eventDate;
-    private Venue venue;
-    private Sets sets;
-    private Artist artist; // 가수 정보 추가
+    private List<Setlist> setlist;
 
-    public String getEventDate() {
-        return eventDate;
+    public List<Setlist> getSetlist() {
+        return setlist != null ? setlist : new ArrayList<>();
     }
 
-    public void setEventDate(String eventDate) {
-        this.eventDate = eventDate;
+    public void setSetlist(List<Setlist> setlist) {
+        this.setlist = setlist;
     }
 
-    public Venue getVenue() {
-        return venue;
-    }
+    public static class Setlist {
+        private String eventDate;
+        private Venue venue;
+        private Artist artist;
+        private Sets sets;
 
-    public void setVenue(Venue venue) {
-        this.venue = venue;
-    }
-
-    public Sets getSets() {
-        return sets;
-    }
-
-    public void setSets(Sets sets) {
-        this.sets = sets;
-    }
-
-    public Artist getArtist() {
-        return artist;
-    }
-
-    public void setArtist(Artist artist) {
-        this.artist = artist;
-    }
-
-    public static class Artist {
-        private String name;
-
-        public String getName() {
-            return name;
+        public String getEventDate() {
+            return eventDate;
         }
 
-        public void setName(String name) {
-            this.name = name;
+        public void setEventDate(String eventDate) {
+            this.eventDate = eventDate;
+        }
+
+        public Venue getVenue() {
+            return venue != null ? venue : new Venue(); // Null 방지
+        }
+
+        public void setVenue(Venue venue) {
+            this.venue = venue;
+        }
+
+        public Artist getArtist() {
+            return artist != null ? artist : new Artist(); // Null 방지
+        }
+
+        public void setArtist(Artist artist) {
+            this.artist = artist;
+        }
+
+        public Sets getSets() {
+            return sets != null ? sets : new Sets(); // Null 방지
+        }
+
+        public void setSets(Sets sets) {
+            this.sets = sets;
         }
     }
 
@@ -57,7 +58,7 @@ public class SetlistDTO {
         private City city;
 
         public String getName() {
-            return name;
+            return name != null ? name : "Unknown Venue"; // 기본값 설정
         }
 
         public void setName(String name) {
@@ -65,7 +66,7 @@ public class SetlistDTO {
         }
 
         public City getCity() {
-            return city;
+            return city != null ? city : new City(); // Null 방지
         }
 
         public void setCity(City city) {
@@ -77,7 +78,19 @@ public class SetlistDTO {
         private String name;
 
         public String getName() {
-            return name;
+            return name != null ? name : "Unknown City"; // 기본값 설정
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+
+    public static class Artist {
+        private String name;
+
+        public String getName() {
+            return name != null ? name : "Unknown Artist"; // 기본값 설정
         }
 
         public void setName(String name) {
@@ -89,7 +102,7 @@ public class SetlistDTO {
         private List<Set> set;
 
         public List<Set> getSet() {
-            return set;
+            return set != null ? set : new ArrayList<>(); // 빈 리스트 반환
         }
 
         public void setSet(List<Set> set) {
@@ -101,7 +114,7 @@ public class SetlistDTO {
         private List<Song> song;
 
         public List<Song> getSong() {
-            return song;
+            return song != null ? song : new ArrayList<>(); // 빈 리스트 반환
         }
 
         public void setSong(List<Song> song) {
@@ -113,7 +126,7 @@ public class SetlistDTO {
         private String name;
 
         public String getName() {
-            return name;
+            return name != null ? name : "Unknown Song"; // 기본값 설정
         }
 
         public void setName(String name) {

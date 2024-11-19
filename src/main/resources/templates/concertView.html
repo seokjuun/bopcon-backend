@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>공연 셋리스트</title>
+</head>
+<body>
+<h1>공연 셋리스트</h1>
+<div th:if="${setlistDTO != null}">
+  <h2 th:each="setlist : ${setlistDTO.setlist}">
+    <p th:text="'가수: ' + ${setlist.artist.name}"></p>
+    <p th:text="'공연 날짜: ' + ${setlist.eventDate}"></p>
+    <p th:text="'공연 장소: ' + ${setlist.venue.name + ', ' + setlist.venue.city.name}"></p>
+    <h4>곡 목록:</h4>
+    <ul th:each="set : ${setlist.sets.set}">
+      <li th:each="song : ${set.song}" th:text="${song.name}"></li>
+    </ul>
+  </h2>
+</div>
+<div th:if="${error != null}">
+  <p th:text="${error}"></p>
+</div>
+</body>
+</html>
