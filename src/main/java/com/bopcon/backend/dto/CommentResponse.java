@@ -9,14 +9,14 @@ import java.time.LocalDateTime;
 public class CommentResponse {
     private Long id;
     private String content;
-    private String userName; // 작성자 이름
+    private String nickname;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     public CommentResponse(Comment comment) {
         this.id = comment.getId();
         this.content = comment.getContent();
-        this.userName = comment.getUser().getNickname(); // User 엔티티에 `name` 필드가 있다고 가정
+        this.nickname = comment.getUser().getNickname();
         this.createdAt = comment.getCreatedAt();
         this.updatedAt = comment.getUpdatedAt();
     }
