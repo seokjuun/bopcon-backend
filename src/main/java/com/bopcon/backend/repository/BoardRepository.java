@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface BoardRepository extends JpaRepository<Article, Long> {
-    List<Article> findByArtistArtistId(Long artistId);
+    List<Article> findByArtistArtistId(Long id);
 }

@@ -49,9 +49,9 @@ public class BoardApiController {
     }
 
     // 특정 아티스트 게시물 조회
-    @GetMapping("/api/articles/artist/{artistId}")
-    public ResponseEntity<List<ArticleResponse>> findArtistArticles(@PathVariable long artistId) {
-        List<ArticleResponse> articles = boardService.findByArtist(artistId)
+    @GetMapping("/api/articles/artist/{id}")
+    public ResponseEntity<List<ArticleResponse>> findArtistArticles(@PathVariable long id) {
+        List<ArticleResponse> articles = boardService.findByArtist(id)
                 .stream()
                 .map(ArticleResponse::new)
                 .toList();

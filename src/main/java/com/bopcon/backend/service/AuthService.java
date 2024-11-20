@@ -41,5 +41,6 @@ public class AuthService {
         refreshTokenRepository.save(token);
 
         return new LoginResponse(accessToken, refreshToken, user.getNickname());
+
     }
 }

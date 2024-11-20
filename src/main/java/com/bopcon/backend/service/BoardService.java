@@ -47,9 +47,9 @@ public class BoardService {
     }
 
     // 글 조회 : 아티스트 id 이용
-    public List<Article> findByArtist(long artistId){
+    public List<Article> findByArtist(long id){
 
-        return boardRepository.findByArtistArtistId(artistId);
+        return boardRepository.findByArtistArtistId(id);
     }
 
     // 글 삭제 : ID를 받은 뒤, deleteByID() 메서드로 디비에서 데이터 삭제
