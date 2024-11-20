@@ -46,6 +46,12 @@ public class BoardService {
         // 값이 없을 때 (잘못된인자) 던질 예외를 람다로 정의
     }
 
+    // 글 조회 : 아티스트 id 이용
+    public List<Article> findByArtist(long artistId){
+
+        return boardRepository.findByArtistArtistId(artistId);
+    }
+
     // 글 삭제 : ID를 받은 뒤, deleteByID() 메서드로 디비에서 데이터 삭제
     public void delete(long id){
         boardRepository.deleteById(id);

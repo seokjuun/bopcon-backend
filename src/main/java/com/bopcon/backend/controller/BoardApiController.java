@@ -41,15 +41,23 @@ public class BoardApiController {
 
 
     //글 조회
-    @GetMapping("/api/articles/{id}") // URL 에서 {id}에 해당하는 값이 id 로 들어옴
-    //url 경로에서 값 추출
+    @GetMapping("/api/articles/{id}")
     public ResponseEntity<ArticleResponse> findArticle(@PathVariable long id)
     {
-        Article article = boardService.findById(id); // 엔티티 조회, 없으면 예외
-
+        Article article = boardService.findById(id);
         return ResponseEntity.ok().body(new ArticleResponse(article));
     }
-    // @PathVariable : URL 에서 값을 가져오는 애너테이션, 여기선 id 값
+
+    // 특정 아티스트 게시물 조회
+    @GetMapping("/api/articles/artist/{artistId}")
+    public ResponseEntity<List<ArticleResponse>> findArtistArticles(@PathVariable long artistId) {
+        List<ArticleResponse> articles = boardService.findByArtist(artistId)
+                .stream()
+                .map(ArticleResponse::new)
+                .toList();
+        return ResponseEntity.ok().body(articles);
+    }
+
 
     // 글 삭제
     @DeleteMapping("/api/articles/{id}")
@@ -61,12 +69,13 @@ public class BoardApiController {
 
     // 글 수정
     @PutMapping("/api/articles/{id}")
-    public ResponseEntity<Article> updateArticle(@PathVariable long id, @RequestBody UpdateArticleRequest request){
+    public ResponseEntity<AddArticleResponse> updateArticle(@PathVariable long id, @RequestBody UpdateArticleRequest request){
         if (!request.isValid()) {
             return ResponseEntity.badRequest().build(); // 유효하지 않은 요청 처리
         }
 
         Article updateArticle = boardService.update(id, request);
-        return ResponseEntity.ok().body(updateArticle); //응답 값은 body 에 담아 전송
+        AddArticleResponse response = new AddArticleResponse(updateArticle);
+        return ResponseEntity.ok().body(response); //응답 값은 body 에 담아 전송
     }
 }
