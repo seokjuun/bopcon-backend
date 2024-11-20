@@ -21,7 +21,7 @@ public class ArtistApiController {
     // 등록
     @PostMapping("/api/admin/artist")
     public ResponseEntity<Artist> addArtist(@RequestBody AddArtistRequest request) {
-        Artist  savedArtist = artistService.save(request);
+        Artist savedArtist = artistService.save(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedArtist);
     }
     // 아티스트 전체 조회

@@ -56,4 +56,11 @@ public class NewConcertService {
         newConcertRepository.deleteById(concertId);
     }
 
+    // 아티스트 콘서트 가져오기
+    public List<NewConcert> findNewConcertsByArtistId(Long artistId){
+        Artist artist = artistRepository.findById(artistId)
+                .orElseThrow(()->new IllegalArgumentException("Invalid artistId: "+ artistId));
+
+        return newConcertRepository.findByArtist(artist);
+    }
 }

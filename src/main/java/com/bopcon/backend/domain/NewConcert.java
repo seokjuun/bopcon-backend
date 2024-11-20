@@ -25,7 +25,7 @@ public class NewConcert {
 
     @ManyToOne
     @JoinColumn(name = "artist_id")
-    private Artist artistId;
+    private Artist artist;
 
     @Column(name = "title", nullable = false, length = 100)
     private String title;
@@ -76,7 +76,7 @@ public class NewConcert {
                       String venueName, String cityName, String countryName,
                       String countryCode, String ticketPlatforms, String ticketUrl,
                       String posterUrl, String genre, ConcertStatus concertStatus){
-        this.artistId = artistId;
+        this.artist = artistId;
         this.title = title;
         this.subTitle = subTitle;
         this.date = date;
@@ -92,7 +92,7 @@ public class NewConcert {
     }
     // 뉴콘서트 정보 수정 메서드
     public void updateNewConcert(UpdateNewConcertRequest request) {
-        this.artistId = request.getArtistId();
+        this.artist = request.getArtistId();
         this.title = request.getTitle();
         this.subTitle = request.getSubTitle();
         this.date = request.getDate();
