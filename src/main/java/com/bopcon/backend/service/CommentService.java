@@ -20,16 +20,16 @@ public class CommentService {
     private final UserService userService;
 
     // 댓글 추가
-    public Comment addComment(AddCommentRequest request) {
+    public Comment addComment(AddCommentRequest request, User user) {
         Article article = boardService.findById(request.getArticleId()); // 게시글 조회
-        User user = userService.findById(request.getUserId()); // 작성자 조회
 
         Comment comment = Comment.builder()
                 .article(article)
-                .user(user)
+                .user(user) // 인증 유저
                 .content(request.getContent())
                 .build();
 
+        article.updateCommentCount(1);
         return commentRepository.save(comment);
     }
 
@@ -42,7 +42,15 @@ public class CommentService {
     }
 
     // 댓글 삭제
-    public void deleteComment(Long commentId) {
+    public void deleteComment(Long commentId, User user) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("Comment not found: " + commentId));
+
+        if (!comment.getUser().getId().equals(user.getId())) {
+            throw new IllegalStateException("You do not have permission to delete this comment.");
+        }
+
+        comment.getArticle().updateCommentCount(-1); // 댓글 수 감소
         commentRepository.deleteById(commentId);
     }
 }
