@@ -4,6 +4,7 @@ import com.bopcon.backend.domain.Comment;
 import com.bopcon.backend.domain.User;
 import com.bopcon.backend.dto.AddCommentRequest;
 import com.bopcon.backend.dto.CommentResponse;
+import com.bopcon.backend.dto.UpdateCommentRequest;
 import com.bopcon.backend.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -51,6 +52,27 @@ public class CommentApiController {
     }
 
     // 댓글 수정
+    @PutMapping("/api/comments/{id}")
+    public ResponseEntity<CommentResponse> updateComment(
+            @PathVariable Long id,
+            @RequestBody UpdateCommentRequest request,
+            @AuthenticationPrincipal User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User is not authenticated.");
+        }
+
+        Comment updatedComment = commentService.updateComment(id, request, user);
+        return ResponseEntity.ok(new CommentResponse(updatedComment));
+    }
 
     // 특정 유저 댓글 목록 조회 (마이페이지)
+    @GetMapping("/api/comments/user")
+    public ResponseEntity<List<CommentResponse>> findCommentsByUser(@AuthenticationPrincipal User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User is not authenticated.");
+        }
+
+        List<CommentResponse> comments = commentService.findCommentsByUser(user);
+        return ResponseEntity.ok(comments);
+    }
 }

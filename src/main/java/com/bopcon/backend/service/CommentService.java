@@ -5,7 +5,9 @@ import com.bopcon.backend.domain.Comment;
 import com.bopcon.backend.domain.User;
 import com.bopcon.backend.dto.AddCommentRequest;
 import com.bopcon.backend.dto.CommentResponse;
+import com.bopcon.backend.dto.UpdateCommentRequest;
 import com.bopcon.backend.repository.CommentRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -52,5 +54,28 @@ public class CommentService {
 
         comment.getArticle().updateCommentCount(-1); // 댓글 수 감소
         commentRepository.deleteById(commentId);
+    }
+
+    // 댓글 수정
+    @Transactional
+    public Comment updateComment(Long commentId, UpdateCommentRequest request, User user) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("Comment not found: " + commentId));
+
+        // 댓글 작성자인지 확인
+        if (!comment.getUser().getId().equals(user.getId())) {
+            throw new IllegalStateException("You do not have permission to update this comment.");
+        }
+
+        comment.updateContent(request.getContent()); // 내용 수정
+        return comment;
+    }
+
+    // 특정 유저의 댓글 목록 조회
+    public List<CommentResponse> findCommentsByUser(User user) {
+        return commentRepository.findByUserId(user.getId())
+                .stream()
+                .map(CommentResponse::new)
+                .toList();
     }
 }
