@@ -20,11 +20,13 @@ public interface PastConcertRepository extends JpaRepository<PastConcert, Long> 
     // artist 엔티티의 mbid 필드 기준으로 검색
     List<PastConcert> findByArtistId_Mbid(String mbid);
 
-    List<PastConcert> findByArtistId(Artist artistId);
-
+    // artist 엔티티의 name 필드 기준으로 검색
     List<PastConcert> findByArtistId_Name(String name);
 
+//    // 날짜와 장소로 중복된 콘서트 확인
+//    boolean existsByDateAndVenueNameAndCityName(String date, String venueName, String cityName);
 
+    List<PastConcert> findByArtistId_ArtistId(Long artistId);
 
 
 }

@@ -3,6 +3,7 @@ package com.bopcon.backend.repository;
 import com.bopcon.backend.domain.ConcertSetlist;
 import com.bopcon.backend.domain.PastConcert;
 import com.bopcon.backend.domain.Song;
+import jakarta.validation.constraints.Past;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -29,6 +30,12 @@ public interface ConcertSetlistRepository extends JpaRepository<ConcertSetlist, 
 
     @Query("SELECT cs.songId.title FROM ConcertSetlist cs WHERE cs.pastConcert.pastConcertId = :pastConcertId")
     List<String> findSongTitlesByPastConcertId(@Param("pastConcertId") Long pastConcertId);
+
+
+    // 특정 PastConcert ID로 셋리스트 조회
+    List<ConcertSetlist> findByPastConcert_PastConcertIdOrderByOrder(Long pastConcertId);
+
+
 
 
 }

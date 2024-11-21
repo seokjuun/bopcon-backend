@@ -5,7 +5,9 @@ import com.bopcon.backend.domain.Artist;
 import com.bopcon.backend.domain.ConcertSetlist;
 import com.bopcon.backend.domain.PastConcert;
 import com.bopcon.backend.domain.Song;
+import com.bopcon.backend.dto.PastConcertDTO;
 import com.bopcon.backend.dto.PastConcertResponse;
+import com.bopcon.backend.dto.SetlistDTO;
 import com.bopcon.backend.repository.ArtistRepository;
 import com.bopcon.backend.repository.ConcertSetlistRepository;
 import com.bopcon.backend.repository.PastConcertRepository;
@@ -162,11 +164,32 @@ public class PastConcertService {
                 .orElseThrow(() -> new RuntimeException("Past concert not found with ID: " + concertId));
     }
 
-    public List<PastConcert> getPastConcertsByArtistName(String name) {
-        List<PastConcert> concerts = pastConcertRepository.findByArtistId_Name(name);
-        if (concerts == null || concerts.isEmpty()) {
-            throw new RuntimeException("No past concerts found for artist: " + name);
+    @Transactional
+    public List<PastConcertDTO> getPastConcertsByArtistName(String artistName) {
+        List<PastConcert> pastConcerts = pastConcertRepository.findByArtistId_Name(artistName);
+
+        if (pastConcerts.isEmpty()) {
+            throw new IllegalArgumentException("No past concerts found for artist: " + artistName);
         }
-        return concerts;
+
+        return pastConcerts.stream().map(this::convertToDTO).toList();
     }
+
+    private PastConcertDTO convertToDTO(PastConcert pastConcert) {
+        PastConcertDTO dto = new PastConcertDTO();
+        dto.setPastConcertId(pastConcert.getPastConcertId());
+        dto.setVenueName(pastConcert.getVenueName());
+        dto.setCityName(pastConcert.getCityName());
+        dto.setDate(pastConcert.getDate().toLocalDate().toString());
+
+//        List<SetlistDTO> setlists = pastConcert.getSetlists().stream()
+//                .map(setlist -> new SetlistDTO(setlist.getOrder(), setlist.getSongId().getTitle()))
+//                .toList();
+//
+//        dto.setSetlists(setlists);
+        return dto;
+    }
+
 }
+
+

@@ -13,5 +13,6 @@ public interface SongRepository extends JpaRepository<Song, Long> {
 
     Optional<Song> findByTitleAndArtistId(String title, Artist artistId); //곡 제목과 아티스트로 Song을 조회하는 메서드
 
-
+    // 아티스트 이름과 곡 제목으로 노래 조회
+    Optional<Song> findByArtistIdAndTitle(Artist artist, String title);
 }

@@ -1,6 +1,7 @@
 package com.bopcon.backend.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -38,6 +40,10 @@ public class PastConcert {
 
     @Column(name = "date", nullable = false)
     private LocalDateTime date; // 공연 날짜 및 시간
+
+    @OneToMany(mappedBy = "pastConcert", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference // 직렬화 허용
+    private List<ConcertSetlist> setlists;
 
     @Builder
     public PastConcert(Artist artistId, String venueName, String cityName, String country, LocalDateTime date) {

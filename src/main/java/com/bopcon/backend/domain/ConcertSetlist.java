@@ -1,5 +1,6 @@
 package com.bopcon.backend.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -22,6 +23,7 @@ public class ConcertSetlist {
 
     @ManyToOne
     @JoinColumn(name = "pastconcert_id", nullable = true) // Nullable로 설정
+    @JsonBackReference // 순환 방지
     private PastConcert pastConcert; // PastConcert와 연관 관계
 
     @ManyToOne
