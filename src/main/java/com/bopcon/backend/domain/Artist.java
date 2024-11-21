@@ -1,6 +1,7 @@
 package com.bopcon.backend.domain;
 
 import com.bopcon.backend.dto.UpdateArtistRequest;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -34,7 +35,16 @@ public class Artist {
     private String mediaUrl;
 
     @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Favorite> favorites = new ArrayList<>();
+
+    // PastConcert와의 연관 관계 추가
+    @OneToMany(mappedBy = "artistId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PastConcert> pastConcerts = new ArrayList<>();
+
+    // Song과의 연관 관계 추가
+    @OneToMany(mappedBy = "artistId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Song> Song = new ArrayList<>();
 
 
     @Builder // 빌더 패턴으로 객체 생성
