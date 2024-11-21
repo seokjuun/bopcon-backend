@@ -57,6 +57,9 @@ dependencies {
     implementation 'io.netty:netty-resolver-dns-native-macos:4.1.101.Final'
 
 
+    // solar.jar 불러오기
+    implementation files('libs/solar.jar')
+
 
 
 }
