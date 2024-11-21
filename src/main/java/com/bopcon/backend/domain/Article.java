@@ -85,4 +85,9 @@ public class Article {
         FREE_BOARD, // 자유게시판
         NEW_CONCERT     // 콘서트 게시판
     }
+
+    // 댓글 수 업데이트
+    public void updateCommentCount(int count) {
+        this.commentCount += count;
+    }
 }
