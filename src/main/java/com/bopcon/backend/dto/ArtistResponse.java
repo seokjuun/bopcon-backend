@@ -9,6 +9,7 @@ public class ArtistResponse {
     private final Long artistId;
     private final String mbid;
     private final String name;
+    private final String krName;
     private final String imgUrl;
     private final String snsUrl;
     private final String mediaUrl;
@@ -17,6 +18,7 @@ public class ArtistResponse {
         this.artistId = artist.getArtistId();
         this.mbid = artist.getMbid();
         this.name = artist.getName();
+        this.krName = artist.getKrName();
         this.imgUrl = artist.getImgUrl();
         this.snsUrl = artist.getSnsUrl();
         this.mediaUrl = artist.getMediaUrl();
