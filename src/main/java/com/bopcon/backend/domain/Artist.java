@@ -27,12 +27,16 @@ public class Artist {
 
     @Column(name = "name", nullable = false)
     private String name;
+    @Column(name = "kr_name")
+    private String krName;
     @Column(name = "img_url")
     private String imgUrl;
     @Column(name = "sns_url")
     private String snsUrl;
     @Column(name = "media_url")
     private String mediaUrl;
+
+
 
     @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
@@ -48,9 +52,10 @@ public class Artist {
 
 
     @Builder // 빌더 패턴으로 객체 생성
-    public Artist(String mbid, String name, String imgUrl, String snsUrl, String mediaUrl) {
+    public Artist(String mbid, String name, String krName,String imgUrl, String snsUrl, String mediaUrl) {
         this.mbid = mbid;
         this.name = name;
+        this.krName = krName;
         this.imgUrl = imgUrl;
         this.snsUrl = snsUrl;
         this.mediaUrl = mediaUrl;
@@ -60,6 +65,7 @@ public class Artist {
     public void updateArtist(UpdateArtistRequest artist) {
         this.mbid = artist.getMbid();
         this.name = artist.getName();
+        this.krName = artist.getKrName();
         this.imgUrl = artist.getImgUrl();
         this.snsUrl = artist.getSnsUrl();
         this.mediaUrl = artist.getMediaUrl();
