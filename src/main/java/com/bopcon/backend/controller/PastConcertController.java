@@ -94,31 +94,53 @@ public class PastConcertController {
 //        return ResponseEntity.ok(concerts);
 //    }
 
+//    @GetMapping("/fetch")
+//    public ResponseEntity<?> fetchPastConcerts(
+//            @RequestParam(required = false) String mbid,
+//            @RequestParam(required = false) String name) {
+//        try {
+//            if (mbid != null) {
+//                log.info("Fetching past concerts with MBID: {}", mbid);
+//                pastConcertService.fetchAndSavePastConcerts(mbid);
+//            } else if (name != null) {
+//                log.info("Fetching past concerts with artist name: {}", name);
+//                Artist artist = artistRepository.findByName(name)
+//                        .orElseThrow(() -> new RuntimeException("Artist not found with name: " + name));
+//                pastConcertService.fetchAndSavePastConcerts(artist.getMbid());
+//            } else {
+//                throw new IllegalArgumentException("Either 'mbid' or 'name' must be provided");
+//            }
+//            return ResponseEntity.ok().body(Map.of("message", "Past concerts fetched and sav    ed successfully"));
+//        } catch (Exception e) {
+//            log.error("Error fetching past concerts", e);
+//            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+//        }
+
     @PostMapping("/fetch")
-    public ResponseEntity<?> fetchPastConcerts(
-            @RequestParam(required = false) String mbid,
-            @RequestParam(required = false) String name) {
+    public ResponseEntity<?> fetchAndSaveConcerts(@RequestParam String mbid) {
         try {
-            if (mbid != null) {
-                log.info("Fetching past concerts with MBID: {}", mbid);
-                pastConcertService.fetchAndSavePastConcerts(mbid);
-            } else if (name != null) {
-                log.info("Fetching past concerts with artist name: {}", name);
-                Artist artist = artistRepository.findByName(name)
-                        .orElseThrow(() -> new RuntimeException("Artist not found with name: " + name));
-                pastConcertService.fetchAndSavePastConcerts(artist.getMbid());
-            } else {
-                throw new IllegalArgumentException("Either 'mbid' or 'name' must be provided");
-            }
-            return ResponseEntity.ok().body(Map.of("message", "Past concerts fetched and saved successfully"));
+            // 로그로 MBID 확인
+            log.info("Fetching past concerts for MBID: {}", mbid);
+
+            // 과거 콘서트 정보 저장 로직 실행
+            pastConcertService.fetchAndSavePastConcerts(mbid);
+
+            // 성공 응답 반환
+            return ResponseEntity.ok(Map.of("message", "Past concerts fetched and saved successfully."));
         } catch (Exception e) {
-            log.error("Error fetching past concerts", e);
-            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+            // 에러 발생 시 로그 기록
+            log.error("Error while saving past concerts for MBID: {}", mbid, e);
+
+            // 실패 응답 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to save past concerts: " + e.getMessage()));
         }
     }
 
-
-
-
-
 }
+
+
+
+
+
+

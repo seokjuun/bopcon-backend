@@ -44,4 +44,8 @@ public class ConcertSetlist {
         this.songId = song;
         this.order = order;
     }
+
+    public Song getSongId() {
+        return songId;
+    }
 }
