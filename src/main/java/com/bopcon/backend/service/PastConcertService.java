@@ -41,15 +41,34 @@ public class PastConcertService {
 
     public void fetchAndSavePastConcerts(String mbid) {
         try {
+            // 셋리스트 API 호출
             JsonNode root = setlistApiClient.fetchSetlists(mbid);
 
-            for (JsonNode setlistNode : root.path("setlist")) {
-                PastConcert pastConcert = savePastConcert(setlistNode, mbid);
+            // API에서 반환된 콘서트 리스트 가져오기
+            JsonNode setlists = root.path("setlist");
+            if (!setlists.isArray()) {
+                logger.warn("No setlists found for mbid: {}", mbid);
+                return;
+            }
 
+            // 최대 20개의 콘서트만 처리
+            int concertLimit = 20;
+            int processedCount = 0;
+
+            for (JsonNode setlistNode : setlists) {
+                if (processedCount >= concertLimit) {
+                    break; // 20개를 초과하면 중지
+                }
+
+                PastConcert pastConcert = savePastConcert(setlistNode, mbid);
                 if (pastConcert != null) {
                     saveConcertSetlist(setlistNode, pastConcert);
+                    processedCount++;
                 }
             }
+
+            logger.info("Processed {} concerts for mbid: {}", processedCount, mbid);
+
         } catch (Exception e) {
             logger.error("Error while fetching and saving past concerts for mbid: {}", mbid, e);
             throw new RuntimeException("Failed to fetch and save past concerts for mbid: " + mbid, e);
@@ -97,38 +116,51 @@ public class PastConcertService {
         if (setsNode.isArray() && setsNode.size() > 0) {
             int order = 1;
 
-            // 해당 PastConcert에 이미 저장된 곡 제목 가져오기 (한 번만 호출)
-            List<String> existingSongTitles = concertSetlistRepository.findSongTitlesByPastConcertId(pastConcert.getPastConcertId());
+            // 기존의 Song ID를 미리 조회하여 Map으로 저장
+            Map<String, Song> existingSongs = songRepository
+                    .findAllByArtistId(pastConcert.getArtistId())
+                    .stream()
+                    .collect(Collectors.toMap(Song::getTitle, song -> song));
+
+            // 기존의 ConcertSetlist 데이터 미리 조회
+            Set<Long> existingSetlists = concertSetlistRepository
+                    .findAllByPastConcert(pastConcert)
+                    .stream()
+                    .map(setlist -> setlist.getSongId().getSongId())
+                    .collect(Collectors.toSet());
 
             // JSON의 모든 set 순회
             for (JsonNode setNode : setsNode) {
                 for (JsonNode songNode : setNode.path("song")) {
                     String songTitle = songNode.path("name").asText(null);
 
-                    if (isValidSong(songTitle) && !existingSongTitles.contains(songTitle)) {
-                        // 곡 정보를 데이터베이스에서 조회하거나 새로 생성
-                        Song song = songRepository.findByTitleAndArtistId(songTitle, pastConcert.getArtistId())
-                                .orElseGet(() -> songRepository.save(Song.builder()
-                                        .artistId(pastConcert.getArtistId())
-                                        .title(songTitle)
-                                        .count(1) // 초기 재생 횟수
-                                        .ytLink(null)
-                                        .build()));
+                    if (isValidSong(songTitle)) {
+                        // 곡 정보가 기존 데이터에 없는 경우 새로 추가
+                        Song song = existingSongs.getOrDefault(songTitle, null);
+                        if (song == null) {
+                            song = songRepository.save(Song.builder()
+                                    .artistId(pastConcert.getArtistId())
+                                    .title(songTitle)
+                                    .count(1) // 초기 카운트 1로 설정
+                                    .ytLink(null)
+                                    .build());
+                            existingSongs.put(songTitle, song);
+                        } else {
+                            // 곡 카운트 업데이트
+                            song.setCount(song.getCount() + 1);
+                            songRepository.save(song);
+                        }
 
-                        // 새로운 ConcertSetlist 엔티티 생성 및 저장
-                        ConcertSetlist concertSetlist = ConcertSetlist.builder()
-                                .pastConcert(pastConcert)
-                                .song(song)
-                                .order(order++) // 곡 순서 설정
-                                .build();
-
-                        concertSetlistRepository.save(concertSetlist);
-                        logger.info("Added song '{}' to concert setlist for '{}'", songTitle, pastConcert.getVenueName());
-
-                        // 추가된 곡 제목을 목록에 추가
-                        existingSongTitles.add(songTitle);
-                    } else {
-                        logger.info("Duplicate entry skipped for song: {}", songTitle);
+                        // ConcertSetlist에 추가되지 않은 경우만 저장
+                        if (!existingSetlists.contains(song.getSongId())) {
+                            ConcertSetlist concertSetlist = ConcertSetlist.builder()
+                                    .pastConcert(pastConcert)
+                                    .song(song)
+                                    .order(order++) // 곡 순서 설정
+                                    .build();
+                            concertSetlistRepository.save(concertSetlist);
+                            existingSetlists.add(song.getSongId());
+                        }
                     }
                 }
             }
@@ -155,9 +187,9 @@ public class PastConcertService {
                 .collect(Collectors.toList());
     }
 
-    public List<PastConcert> getPastConcertsByArtist(String mbid) {
-        return pastConcertRepository.findByArtistId_Mbid(mbid);
-    }
+//    public List<PastConcert> getPastConcertsByArtist(String mbid) {
+//        return pastConcertRepository.findByArtistId_Mbid(mbid);
+//    }
 
     public PastConcert getPastConcertById(Long concertId) {
         return pastConcertRepository.findById(concertId)

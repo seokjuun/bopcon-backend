@@ -36,6 +36,10 @@ public interface ConcertSetlistRepository extends JpaRepository<ConcertSetlist, 
     List<ConcertSetlist> findByPastConcert_PastConcertIdOrderByOrder(Long pastConcertId);
 
 
+    boolean existsByPastConcertAndSongId(PastConcert pastConcert, Song songId);
+
+    List<ConcertSetlist> findAllByPastConcert(PastConcert pastConcert);
+
 
 
 }

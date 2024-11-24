@@ -36,6 +36,15 @@ public class Song {
     @Column(name = "yt_link", length = 255)
     private String ytLink; // YouTube 링크
 
+
+    // 정적 팩토리 메서드
+    public static Song create(String title) {
+        Song song = new Song();
+        song.setTitle(title);
+        song.setCount(0); // 초기 count 값
+        return song;
+    }
+
     @Builder
     public Song(Artist artistId, String title, Integer count, String ytLink) {
         this.artistId = artistId;
@@ -74,4 +83,14 @@ public class Song {
     }
 
 
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+   public String getTitle() {
+        return title;
+   }
+   public void setTitle(String title) {
+        this.title = title;
+   }
 }
