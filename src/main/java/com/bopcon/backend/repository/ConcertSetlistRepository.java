@@ -28,18 +28,29 @@ public interface ConcertSetlistRepository extends JpaRepository<ConcertSetlist, 
 //    boolean existsByPastConcertAndSong(@Param("pastConcert") PastConcert pastConcert,
 //                                       @Param("song") Song songId);
 
-    @Query("SELECT cs.songId.title FROM ConcertSetlist cs WHERE cs.pastConcert.pastConcertId = :pastConcertId")
-    List<String> findSongTitlesByPastConcertId(@Param("pastConcertId") Long pastConcertId);
 
 
-    // 특정 PastConcert ID로 셋리스트 조회
-    List<ConcertSetlist> findByPastConcert_PastConcertIdOrderByOrder(Long pastConcertId);
+        // 특정 PastConcert ID에 해당하는 곡 제목 리스트 조회
+        @Query("SELECT cs.songId.title FROM ConcertSetlist cs WHERE cs.pastConcert.pastConcertId = :pastConcertId")
+        List<String> findSongTitlesByPastConcertId(@Param("pastConcertId") Long pastConcertId);
+
+        // 특정 PastConcert ID에 해당하는 셋리스트를 순서대로 조회
+        List<ConcertSetlist> findByPastConcert_PastConcertIdOrderByOrder(Long pastConcertId);
+
+        // 특정 PastConcert와 Song 간의 관계가 존재하는지 확인
+        boolean existsByPastConcertAndSongId(PastConcert pastConcert, Song songId);
+
+        // 특정 PastConcert에 포함된 모든 셋리스트 반환
+        List<ConcertSetlist> findAllByPastConcert(PastConcert pastConcert);
+
+        // 특정 아티스트 ID로 모든 곡 제목 가져오기 (중복 제거)
+        @Query("SELECT DISTINCT cs.songId.title FROM ConcertSetlist cs WHERE cs.pastConcert.artistId.artistId = :artistId")
+        List<String> findAllSongTitlesByArtistId(@Param("artistId") Long artistId);
+
+        // 특정 아티스트 ID로 모든 셋리스트 데이터 가져오기
+        @Query("SELECT cs FROM ConcertSetlist cs WHERE cs.pastConcert.artistId.artistId = :artistId ORDER BY cs.order ASC")
+        List<ConcertSetlist> findAllByArtistId(@Param("artistId") Long artistId);
+    }
 
 
-    boolean existsByPastConcertAndSongId(PastConcert pastConcert, Song songId);
 
-    List<ConcertSetlist> findAllByPastConcert(PastConcert pastConcert);
-
-
-
-}
