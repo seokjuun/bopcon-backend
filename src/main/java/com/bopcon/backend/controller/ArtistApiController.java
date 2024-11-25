@@ -4,6 +4,7 @@ import com.bopcon.backend.domain.Artist;
 import com.bopcon.backend.domain.NewConcert;
 import com.bopcon.backend.dto.AddArtistRequest;
 import com.bopcon.backend.dto.ArtistResponse;
+import com.bopcon.backend.dto.ArtistWithConcertsResponse;
 import com.bopcon.backend.dto.UpdateArtistRequest;
 import com.bopcon.backend.service.ArtistService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ArtistApiController {
     private final ArtistService artistService;
+
+    @GetMapping("/api/artists/search")
+    public ResponseEntity<ArtistWithConcertsResponse> searchArtistByName(@RequestParam String name) {
+        Artist artist = artistService.findArtistWithConcerts(name);
+        return ResponseEntity.ok(new ArtistWithConcertsResponse(artist));
+    }
+
+
     // 등록
     @PostMapping("/api/admin/artist")
     public ResponseEntity<Artist> addArtist(@RequestBody AddArtistRequest request) {

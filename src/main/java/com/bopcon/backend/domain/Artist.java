@@ -32,10 +32,16 @@ public class Artist {
     private String snsUrl;
     @Column(name = "media_url")
     private String mediaUrl;
+    @Column(name = "kr_name") // 🔥 한글 이름 필드
+    private String krName;
+
 
     @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Favorite> favorites = new ArrayList<>();
 
+    // NewConcert와의 연관관계 (1:N)
+    @OneToMany(mappedBy = "artistId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<NewConcert> concerts = new ArrayList<>();
 
     @Builder // 빌더 패턴으로 객체 생성
     public Artist(String mbid, String name, String imgUrl, String snsUrl, String mediaUrl) {

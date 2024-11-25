@@ -16,6 +16,13 @@ import java.util.List;
 public class ArtistService {
     private final ArtistRepository artistRepository;
 
+    // 이름(name) 또는 한글 이름(krName)으로 검색
+    public Artist findArtistWithConcerts(String keyword) {
+        return artistRepository.findByNameContainingIgnoreCaseOrKrNameContainingIgnoreCase(keyword, keyword)
+                .orElseThrow(() -> new IllegalArgumentException("Artist not found: " + keyword));
+    }
+
+
     // 아티스트 추가 메서드
     public Artist save(AddArtistRequest request) {  return artistRepository.save(request.toArtist());}
 
