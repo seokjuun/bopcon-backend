@@ -14,10 +14,14 @@ import java.util.Optional;
 public interface SongRepository extends JpaRepository<Song, Long> {
     Optional<Song> findByTitle(String title); // 아티스트 ID와 곡 제목으로 검색
 
-    Optional<Song> findByTitleAndArtistId(String title, Artist artistId); //곡 제목과 아티스트로 Song을 조회하는 메서드
-
+    @Query("SELECT s FROM Song s WHERE s.title = :title AND s.artistId.artistId = :artistId")
+    Optional<Song> findByTitleAndArtistId(@Param("title") String title, @Param("artistId") Long artistId);
     // 아티스트 이름과 곡 제목으로 노래 조회
     Optional<Song> findByArtistIdAndTitle(Artist artist, String title);
+
+    // 새로운 메서드 - 숫자 '1'을 포함 (Artist ID를 Long 타입으로 사용)
+    @Query("SELECT s FROM Song s WHERE s.artistId.artistId = :artistId AND s.title = :title")
+    Optional<Song> findByArtistIdAndTitle1(@Param("artistId") Long artistId, @Param("title") String title);
 
     List<Song> findAllByArtistId(Artist artistId);
 
