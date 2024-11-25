@@ -106,4 +106,13 @@ public class NewConcert {
         this.genre = request.getGenre();
         this.concertStatus = request.getConcertStatus();
     }
+
+    public ConcertStatus getConcertStatus() {
+        return concertStatus;
+    }
+
+    public void setConcertStatus(NewConcert.ConcertStatus concertStatus) {
+        this.concertStatus = concertStatus;
+    }
+
 }

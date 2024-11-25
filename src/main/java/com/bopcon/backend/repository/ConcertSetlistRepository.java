@@ -3,8 +3,10 @@ package com.bopcon.backend.repository;
 import com.bopcon.backend.domain.ConcertSetlist;
 import com.bopcon.backend.domain.PastConcert;
 import com.bopcon.backend.domain.Song;
+import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.Past;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -50,7 +52,21 @@ public interface ConcertSetlistRepository extends JpaRepository<ConcertSetlist, 
         // 특정 아티스트 ID로 모든 셋리스트 데이터 가져오기
         @Query("SELECT cs FROM ConcertSetlist cs WHERE cs.pastConcert.artistId.artistId = :artistId ORDER BY cs.order ASC")
         List<ConcertSetlist> findAllByArtistId(@Param("artistId") Long artistId);
-    }
+
+
+        /**
+         * 특정 NewConcert에 연결된 셋리스트를 삭제
+         *
+         * @param newConcertId NewConcert ID
+         */
+        @Modifying
+        @Transactional
+        @Query("DELETE FROM ConcertSetlist cs WHERE cs.newConcert.newConcertId = :newConcertId")
+        void deleteByNewConcertId(@Param("newConcertId") Long newConcertId);
+
+        List<ConcertSetlist> findByNewConcert_NewConcertIdOrderByOrder(Long newConcertId);
+
+}
 
 
 

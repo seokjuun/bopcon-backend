@@ -25,10 +25,18 @@ public interface SongRepository extends JpaRepository<Song, Long> {
 
     List<Song> findAllByArtistId(Artist artistId);
 
+    Optional<Song> findFirstByTitleAndArtistId(String title, Artist artist);
+
+
+
 
 
 
     // 아티스트 ID 기준으로 곡을 카운트 순으로 내림차순 정렬
     @Query("SELECT s FROM Song s WHERE s.artistId.artistId = :artistId ORDER BY s.count DESC")
     List<Song> findTopSongsByArtistId(@Param("artistId") Long artistId);
+
+    @Query("SELECT s FROM Song s WHERE s.artistId.artistId = :artistId AND s.title IN :titles")
+    List<Song> findAllByArtistIdAndTitleIn(@Param("artistId") Long artistId, @Param("titles") List<String> titles);
+
 }
