@@ -1,14 +1,11 @@
 package com.bopcon.backend.controller;
 
 import com.bopcon.backend.domain.Artist;
-import com.bopcon.backend.domain.NewConcert;
 import com.bopcon.backend.dto.AddArtistRequest;
 import com.bopcon.backend.dto.ArtistResponse;
-import com.bopcon.backend.dto.ArtistWithConcertsResponse;
 import com.bopcon.backend.dto.UpdateArtistRequest;
 import com.bopcon.backend.service.ArtistService;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.sql.Update;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,11 +17,6 @@ import java.util.List;
 public class ArtistApiController {
     private final ArtistService artistService;
 
-    @GetMapping("/api/artists/search")
-    public ResponseEntity<ArtistWithConcertsResponse> searchArtistByName(@RequestParam String name) {
-        Artist artist = artistService.findArtistWithConcerts(name);
-        return ResponseEntity.ok(new ArtistWithConcertsResponse(artist));
-    }
 
 
     // 등록

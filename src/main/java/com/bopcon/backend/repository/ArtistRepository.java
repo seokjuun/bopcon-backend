@@ -7,6 +7,6 @@ import java.util.Optional;
 
 public interface ArtistRepository extends JpaRepository<Artist, Long> {
 
-    // 이름(name) 또는 한글 이름(krName)으로 검색
+    // 🔥 키워드로 아티스트 검색 (영문/한글 이름)
     Optional<Artist> findByNameContainingIgnoreCaseOrKrNameContainingIgnoreCase(String name, String krName);
 }
