@@ -10,6 +10,7 @@ import java.util.Optional;
 public interface NewConcertRepository extends JpaRepository<NewConcert, Long> {
     List<NewConcert> findByGenre(String genre);
 
-    List<NewConcert> findByArtistId_ArtistIdAndConcertStatus(Long artistId, NewConcert.ConcertStatus concertStatus);
+    List<NewConcert> findByArtist_ArtistIdAndConcertStatus(Long artistId, NewConcert.ConcertStatus concertStatus);
 
+    List<NewConcert> findByArtist(Artist artist);
 }

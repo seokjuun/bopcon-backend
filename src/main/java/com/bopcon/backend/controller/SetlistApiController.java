@@ -109,7 +109,7 @@ public class SetlistApiController {
                     .toList();
 
             // 3. 기존 예상 셋리스트 삭제
-            List<NewConcert> existingConcerts = newConcertRepository.findByArtistId_ArtistIdAndConcertStatus(
+            List<NewConcert> existingConcerts = newConcertRepository.findByArtist_ArtistIdAndConcertStatus(
                     artistId.getArtistId(), NewConcert.ConcertStatus.UPCOMING
             );
 

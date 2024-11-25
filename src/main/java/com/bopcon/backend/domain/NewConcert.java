@@ -65,6 +65,10 @@ public class NewConcert {
     @OneToMany(mappedBy = "newConcert", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Favorite> favorites = new ArrayList<>();
 
+    public Artist getArtistId() {
+        return artist;
+    }
+
 
     public enum ConcertStatus {
         UPCOMING,
