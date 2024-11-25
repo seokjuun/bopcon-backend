@@ -1,9 +1,6 @@
 package com.bopcon.backend.service;
 
-import com.bopcon.backend.domain.Artist;
-import com.bopcon.backend.domain.ConcertSetlist;
-import com.bopcon.backend.domain.PastConcert;
-import com.bopcon.backend.domain.Song;
+import com.bopcon.backend.domain.*;
 import com.bopcon.backend.dto.PastConcertDTO;
 import com.bopcon.backend.dto.SetlistDTO;
 import com.bopcon.backend.repository.ArtistRepository;
@@ -55,23 +52,23 @@ public class ConcertSetlistService {
      * @return 예상 셋리스트
      */
     public Mono<String> generatePredictedSetlist(Long artistId) {
-        // 1. 아티스트 정보를 조회
+        // 1. 아티스트 정보 조회
         Artist artist = artistRepository.findById(artistId)
                 .orElseThrow(() -> new IllegalArgumentException("Artist with ID " + artistId + " not found."));
 
         String artistName = artist.getName();
-        String mbid = artist.getMbid();
 
-        // 2. 과거 콘서트 데이터를 가져옵니다.
+        // 2. 과거 콘서트 데이터 수집
         List<PastConcert> pastConcerts = pastConcertRepository.findByArtistId_ArtistId(artistId);
 
         if (pastConcerts.isEmpty()) {
             return Mono.error(new IllegalArgumentException("No past concerts found for the artist."));
         }
 
-        // 3. 모든 과거 콘서트에서 곡 제목을 수집합니다.
+        // 3. 과거 콘서트에서 곡 제목 수집
         List<String> songTitles = pastConcerts.stream()
-                .flatMap(pastConcert -> concertSetlistRepository.findByPastConcert_PastConcertIdOrderByOrder(pastConcert.getPastConcertId())
+                .flatMap(pastConcert -> concertSetlistRepository
+                        .findByPastConcert_PastConcertIdOrderByOrder(pastConcert.getPastConcertId())
                         .stream()
                         .map(setlist -> setlist.getSongId().getTitle()))
                 .collect(Collectors.toList());
@@ -80,16 +77,16 @@ public class ConcertSetlistService {
             return Mono.error(new IllegalArgumentException("No songs found in the past concerts."));
         }
 
-        // 4. 곡 제목을 Solar API에 전달하기 위한 문자열로 변환합니다.
+        // 4. 곡 제목 데이터를 Solar API에 전달할 형식으로 변환
         String songData = String.join(", ", songTitles);
 
-        // 5. Solar API 프롬프트 구성
+        // 5. Solar API 호출 프롬프트 및 메시지 구성
         String prompt = "당신은 과거 콘서트 데이터를 기반으로 다음 콘서트 셋리스트를 예측하는 AI입니다.";
         String message = String.format("아티스트 [%s]의 과거 콘서트 곡 목록: [%s]. " +
-                "이 데이터를 기반으로 예상 셋리스트를 생성해 주세요." +
-                "앞에 순서는 꼭 넣어주시길 바랍니다.", artistName, songData);
+                "이 데이터를 기반으로 예상 셋리스트를 생성해 주세요. " +
+                "각 곡의 순서를 포함해야 합니다.", artistName, songData);
 
-        // 6. Solar API를 호출하여 예상 셋리스트 생성
+        // 6. Solar API 호출 및 결과 반환
         return solarClient.sendMessage(prompt, message)
                 .doOnNext(result -> System.out.println("예상 셋리스트 생성 성공: " + result))
                 .doOnError(error -> System.err.println("예상 셋리스트 생성 중 오류 발생: " + error.getMessage()));
@@ -231,5 +228,54 @@ public class ConcertSetlistService {
         return songRepository.findByArtistIdAndTitle1(artistId, title)
                 .orElseThrow(() -> new IllegalArgumentException("Song with title '" + title + "' not found for artist ID " + artistId));
     }
+
+
+
+
+
+    @Transactional
+    public void savePredictedSetlistToDatabase(NewConcert newConcert, List<Map<String, Object>> setlistJson) {
+        // 곡 제목 목록 수집
+        List<String> songTitles = setlistJson.stream()
+                .map(songData -> (String) songData.get("title"))
+                .collect(Collectors.toList());
+
+        // 기존 곡들을 한 번의 쿼리로 조회하여 캐싱
+        Map<String, Song> existingSongs = songRepository
+                .findAllByArtistIdAndTitleIn(newConcert.getArtistId().getArtistId(), songTitles)
+                .stream()
+                .collect(Collectors.toMap(Song::getTitle, song -> song));
+
+        // 순서를 위한 변수
+        int order = 1;
+
+        // 예상 셋리스트 저장
+        for (Map<String, Object> songData : setlistJson) {
+            String title = (String) songData.get("title");
+
+            // 기존 곡 또는 새 곡 생성
+            Song song = existingSongs.getOrDefault(title,
+                    songRepository.save(
+                            Song.builder()
+                                    .artistId(newConcert.getArtistId())
+                                    .title(title)
+                                    .count(0)
+                                    .ytLink(null) // YouTube 링크는 초기화
+                                    .build()
+                    ));
+
+            // ConcertSetlist 생성 및 저장
+            ConcertSetlist setlist = ConcertSetlist.builder()
+                    .newConcert(newConcert) // NewConcert와 연관
+                    .song(song)             // Song과 연관
+                    .order(order++)         // 순서 저장
+                    .build();
+
+            concertSetlistRepository.save(setlist);
+        }
+    }
+
+
+
 
 }
