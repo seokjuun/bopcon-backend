@@ -116,7 +116,7 @@ public class PastConcertController {
 //            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
 //        }
 
-    @PostMapping("/fetch")
+    @GetMapping("/fetch")
     public ResponseEntity<?> fetchAndSaveConcerts(@RequestParam String mbid) {
         try {
             // 로그로 MBID 확인
