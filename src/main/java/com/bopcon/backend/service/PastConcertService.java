@@ -37,29 +37,23 @@ public class PastConcertService {
     private final ConcertSetlistRepository concertSetlistRepository;
     private final SongRepository songRepository;
 
-    private static final Logger logger = LoggerFactory.getLogger(PastConcertService.class);
+    private static final Logger log = LoggerFactory.getLogger(PastConcertService.class);
 
     public void fetchAndSavePastConcerts(String mbid) {
         try {
-            // 셋리스트 API 호출
+            // 1. 셋리스트 API 호출
             JsonNode root = setlistApiClient.fetchSetlists(mbid);
 
-            // API에서 반환된 콘서트 리스트 가져오기
+            // 2. API에서 반환된 콘서트 리스트 가져오기
             JsonNode setlists = root.path("setlist");
-            if (!setlists.isArray()) {
-                logger.warn("No setlists found for mbid: {}", mbid);
-                return;
+            if (!setlists.isArray() || setlists.size() == 0) {
+                log.warn("No setlists found for mbid: {}", mbid);
+                throw new IllegalArgumentException("No setlists found for MBID: " + mbid);
             }
 
-            // 최대 20개의 콘서트만 처리
-            int concertLimit = 20;
+            // 반환된 콘서트를 모두 처리
             int processedCount = 0;
-
             for (JsonNode setlistNode : setlists) {
-                if (processedCount >= concertLimit) {
-                    break; // 20개를 초과하면 중지
-                }
-
                 PastConcert pastConcert = savePastConcert(setlistNode, mbid);
                 if (pastConcert != null) {
                     saveConcertSetlist(setlistNode, pastConcert);
@@ -67,11 +61,14 @@ public class PastConcertService {
                 }
             }
 
-            logger.info("Processed {} concerts for mbid: {}", processedCount, mbid);
+            log.info("Processed {} concerts for mbid: {}", processedCount, mbid);
 
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid data provided for MBID: {}", mbid, e);
+            throw e; // 클라이언트로 400 에러 반환
         } catch (Exception e) {
-            logger.error("Error while fetching and saving past concerts for mbid: {}", mbid, e);
-            throw new RuntimeException("Failed to fetch and save past concerts for mbid: " + mbid, e);
+            log.error("Error while fetching and saving past concerts for MBID: {}", mbid, e);
+            throw new RuntimeException("Failed to fetch and save past concerts for MBID: " + mbid, e);
         }
     }
 
@@ -82,7 +79,7 @@ public class PastConcertService {
         String date = getNodeValue(setlistNode, "eventDate");
 
         if (venueName == null || cityName == null || date == null) {
-            logger.warn("Invalid data: venueName={}, cityName={}, date={}", venueName, cityName, date);
+            log.warn("Invalid data: venueName={}, cityName={}, date={}", venueName, cityName, date);
             return null;
         }
 
@@ -105,7 +102,7 @@ public class PastConcertService {
                             .country(country)
                             .date(eventDate)
                             .build();
-                    logger.info("Saving new PastConcert: {}", pastConcert);
+                    log.info("Saving new PastConcert: {}", pastConcert);
                     return pastConcertRepository.save(pastConcert);
                 });
     }
