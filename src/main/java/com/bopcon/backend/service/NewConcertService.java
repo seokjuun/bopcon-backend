@@ -10,6 +10,8 @@ import com.bopcon.backend.repository.NewConcertRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +24,7 @@ public class NewConcertService {
     private final ArtistRepository artistRepository;
 
     // 뉴 콘서트 추가 메서드
+    @CacheEvict(value = {"allNewConcerts", "newConcertsByGenre"}, allEntries = true) // 관련 캐시 무효화
     public NewConcert save(AddNewConcertRequest request) {
         Artist artist = artistRepository.findById(request.getArtistId())
                 .orElseThrow(()-> new EntityNotFoundException("Artist not found"));
@@ -30,6 +33,7 @@ public class NewConcertService {
 
     // 뉴 콘서트 수정
     @Transactional
+    @CacheEvict(value = {"allNewConcerts", "newConcertsByGenre"}, allEntries = true) // 관련 캐시 무효화
     public NewConcert update(long newConcertId, UpdateNewConcertRequest request){
         NewConcert newConcert = newConcertRepository.findById(newConcertId)
                 .orElseThrow(()-> new IllegalArgumentException("not found: "+ newConcertId));
@@ -39,21 +43,34 @@ public class NewConcertService {
     }
 
     // 콘서트 목록 가져오기
+    @Cacheable(value = "allNewConcerts", key = "'allConcerts'")
     public List<NewConcert> findAllNewConcerts(){ return newConcertRepository.findAll(); }
 
     // 콘서트 (장르 필터) 목록 가져오기
+    @Cacheable(value = "newConcertsByGenre", key = "#genre")
     public List<NewConcert> findNewConcertsByGenre(String genre){
         return newConcertRepository.findByGenre(genre);
     }
+
     // 콘서트 조회
+    @Cacheable(value = "singleConcert", key = "#concertId")
     public NewConcert findByConcertId(long concertId){
         return newConcertRepository.findById(concertId)
                 .orElseThrow(()-> new IllegalArgumentException("not found: "+ concertId));
     }
 
     // 콘서트 삭제
+    @CacheEvict(value = {"allNewConcerts", "newConcertsByGenre", "singleConcert"}, allEntries = true)
     public void delete(long concertId){
         newConcertRepository.deleteById(concertId);
     }
 
+    // 아티스트 콘서트 가져오기
+    @Cacheable(value = "newConcertsByArtist", key = "#artistId")
+    public List<NewConcert> findNewConcertsByArtistId(Long artistId){
+        Artist artist = artistRepository.findById(artistId)
+                .orElseThrow(()->new IllegalArgumentException("Invalid artistId: "+ artistId));
+
+        return newConcertRepository.findByArtist(artist);
+    }
 }

@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class AddArtistRequest {
     private String mbid;
     private String name;
+    private String krName;
     private String imgUrl;
     private String snsUrl;
     private String mediaUrl;
@@ -21,6 +22,7 @@ public class AddArtistRequest {
         return Artist.builder()
                 .mbid(mbid)
                 .name(name)
+                .krName(krName)
                 .imgUrl(imgUrl)
                 .snsUrl(snsUrl)
                 .mediaUrl(mediaUrl)

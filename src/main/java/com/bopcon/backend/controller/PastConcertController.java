@@ -96,7 +96,7 @@ public class PastConcertController {
 
 
 
-    @PostMapping("/fetch")
+    @GetMapping("/fetch")
     public ResponseEntity<?> fetchAndSaveConcerts(@RequestParam String mbid) {
         try {
             // 로그로 MBID 확인

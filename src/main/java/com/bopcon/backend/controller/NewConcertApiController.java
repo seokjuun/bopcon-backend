@@ -1,9 +1,11 @@
 package com.bopcon.backend.controller;
 
 
+import com.bopcon.backend.domain.Artist;
 import com.bopcon.backend.domain.NewConcert;
 import com.bopcon.backend.dto.AddNewConcertRequest;
 import com.bopcon.backend.dto.NewConcertResponse;
+import com.bopcon.backend.dto.NewConcertSimpleResponse;
 import com.bopcon.backend.dto.UpdateNewConcertRequest;
 import com.bopcon.backend.service.NewConcertService;
 import lombok.RequiredArgsConstructor;
@@ -67,5 +69,18 @@ public class NewConcertApiController {
         newConcertService.delete(concertId);
 
         return ResponseEntity.ok().build(); //Http 응답 생성, build()는 본문이 없는 응답 생성
+    }
+
+
+    // 특정 아티스트 콘서트 조회
+    @GetMapping("/api/artists/{artistId}/concerts")
+    public ResponseEntity<List<NewConcertSimpleResponse>> findConcertsByArtist(@PathVariable Long artistId){
+        List<NewConcertSimpleResponse> newConcerts;
+        newConcerts = newConcertService.findNewConcertsByArtistId(artistId)
+                .stream()
+                .map(NewConcertSimpleResponse::new)
+                .toList();
+
+        return ResponseEntity.ok().body(newConcerts);
     }
 }

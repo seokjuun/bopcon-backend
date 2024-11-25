@@ -1,5 +1,6 @@
 package com.bopcon.backend.repository;
 
+import com.bopcon.backend.domain.Artist;
 import com.bopcon.backend.domain.NewConcert;
 import org.springframework.data.jpa.repository.JpaRepository;
 
