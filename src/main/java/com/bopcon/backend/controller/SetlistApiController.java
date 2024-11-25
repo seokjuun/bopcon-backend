@@ -15,7 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+
 import java.util.*;
 
 @RestController
@@ -42,10 +42,6 @@ public class SetlistApiController {
 
     /**
      * 특정 아티스트의 PastConcert 셋리스트 조회
-     *
-     * @param artistId 아티스트 ID
-     * @param type     조회 유형 (현재는 "past"만 허용)
-     * @return 아티스트의 PastConcert와 셋리스트
      */
     @GetMapping("/artist/{artistId}")
     public ResponseEntity<?> getSetlistsByArtistId(
@@ -58,8 +54,6 @@ public class SetlistApiController {
         try {
             List<PastConcertDTO> result = concertSetlistService.getSetlistsByArtistId(artistId);
             return ResponseEntity.ok(result);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -69,19 +63,23 @@ public class SetlistApiController {
 
     /**
      * 특정 PastConcert의 셋리스트 조회
-     *
-     * @param pastConcertId 과거 콘서트 ID
-     * @return PastConcert에 포함된 셋리스트
      */
     @GetMapping("/past-concert/{pastConcertId}")
     public ResponseEntity<?> getSetlistByPastConcertId(@PathVariable Long pastConcertId) {
         try {
-            List<SetlistDTO> setlist = concertSetlistService.getSetlistByPastConcertId(
-                    concertSetlistService.findPastConcertById(pastConcertId)
+            // PastConcert 조회
+            PastConcert pastConcert = concertSetlistService.findPastConcertById(pastConcertId);
+
+            // Setlist 조회
+            List<SetlistDTO> setlist = concertSetlistService.getSetlistByPastConcertId(pastConcertId);
+
+            // 응답 데이터 구성
+            Map<String, Object> response = Map.of(
+                    "artistId", pastConcert.getArtistId().getArtistId(),
+                    "setlist", setlist
             );
-            return ResponseEntity.ok(setlist);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -89,17 +87,15 @@ public class SetlistApiController {
         }
     }
 
+
     /**
      * Solar API를 사용하여 특정 아티스트의 예상 셋리스트 생성 및 저장
-     *
-     * @param artistId 아티스트 ID
-     * @return 예상 셋리스트
      */
     @GetMapping("/predict/artist/{artistId}")
-    public ResponseEntity<?> generateAndSavePredictedSetlist(@PathVariable Long artistId) {
+    public ResponseEntity<?> generateAndSavePredictedSetlist(@PathVariable Artist artistId) {
         try {
             // 1. 예상 셋리스트 생성
-            String predictedSetlist = concertSetlistService.generatePredictedSetlist(artistId).block();
+            String predictedSetlist = concertSetlistService.generatePredictedSetlist(artistId.getArtistId()).block();
             if (predictedSetlist == null || predictedSetlist.trim().isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No predicted setlist available.");
             }
@@ -112,27 +108,27 @@ public class SetlistApiController {
                     .filter(Objects::nonNull)
                     .toList();
 
-            // 3. NewConcert 생성 및 저장
-            Artist artist = artistRepository.findById(artistId)
-                    .orElseThrow(() -> new IllegalArgumentException("Artist with ID " + artistId + " not found."));
+            // 3. 기존 예상 셋리스트 삭제
+            List<NewConcert> existingConcerts = newConcertRepository.findByArtistId_ArtistIdAndConcertStatus(
+                    artistId.getArtistId(), NewConcert.ConcertStatus.UPCOMING
+            );
 
-            NewConcert newConcert = NewConcert.builder()
-                    .artistId(artist)
-                    .title("Predicted Concert")
-                    .date(LocalDate.now())
-                    .venueName("TBD")
-                    .cityName("TBD")
-                    .countryName("TBD")
-                    .countryCode("TBD")
-                    .concertStatus(NewConcert.ConcertStatus.UPCOMING)
-                    .build();
+            if (existingConcerts.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("No UPCOMING concerts found for artist ID: " + artistId);
+            }
 
-            newConcertRepository.save(newConcert);
+// 첫 번째 콘서트를 사용하거나 적합한 논리를 추가하여 선택
+            NewConcert selectedConcert = existingConcerts.get(0);
 
-            // 4. 예상 셋리스트 저장
-            concertSetlistService.savePredictedSetlistToDatabase(newConcert, setlistJson);
+// 기존 예상 셋리스트 삭제
+            concertSetlistService.deleteSetlistForConcert(selectedConcert.getNewConcertId());
+
+// 새로운 예상 셋리스트 저장
+            concertSetlistService.savePredictedSetlistToDatabase(selectedConcert, setlistJson);
 
             return ResponseEntity.ok(setlistJson);
+
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
@@ -142,24 +138,87 @@ public class SetlistApiController {
         }
     }
 
-    // JSON 변환 유틸리티
-    private Map<String, Object> parseSetlistLine(String line, Long artistId) {
+
+
+
+    @GetMapping("/predict/new-concert/{newConcertId}")
+    public ResponseEntity<?> generateOrFetchPredictedSetlist(@PathVariable Long newConcertId) {
         try {
-            // 점(". ") 기준으로 분리
+            // 1. NewConcert 조회
+            NewConcert newConcert = newConcertRepository.findById(newConcertId)
+                    .orElseThrow(() -> new IllegalArgumentException("NewConcert with ID " + newConcertId + " not found."));
+
+            // 2. 데이터베이스에서 예상 셋리스트 존재 여부 확인
+            List<SetlistDTO> existingSetlist = concertSetlistService.getSetlistByNewConcertId(newConcertId);
+            if (!existingSetlist.isEmpty()) {
+                // 예상 셋리스트가 이미 존재할 경우 반환
+                return ResponseEntity.ok(existingSetlist);
+            }
+
+            // 3. 아티스트 정보 조회
+            Artist artist = newConcert.getArtistId();
+            if (artist == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("error", "Artist not associated with NewConcert ID: " + newConcertId));
+            }
+
+            // 4. 외부 API 호출을 통해 예상 셋리스트 생성
+            String predictedSetlist = concertSetlistService.generatePredictedSetlist(artist.getArtistId()).block();
+            if (predictedSetlist == null || predictedSetlist.trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No predicted setlist available.");
+            }
+
+            // 5. JSON 형태로 변환
+            List<Map<String, Object>> setlistJson = Arrays.stream(predictedSetlist.split("\n"))
+                    .filter(line -> !line.trim().isEmpty() && !line.contains("예상 셋리스트:"))
+                    .filter(line -> !line.toLowerCase().contains("intro"))
+                    .map(line -> parseSetlistLine(line, artist))
+                    .filter(Objects::nonNull)
+                    .toList();
+
+            // 6. 새로운 예상 셋리스트 저장
+            concertSetlistService.savePredictedSetlistToDatabase(newConcert, setlistJson);
+
+            return ResponseEntity.ok(setlistJson);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "An error occurred while generating or fetching the predicted setlist."));
+        }
+    }
+
+    @PatchMapping("/new-concert/{newConcertId}")
+    public ResponseEntity<?> updateConcertStatus(
+            @PathVariable Long newConcertId,
+            @RequestParam NewConcert.ConcertStatus status) {
+        try {
+            concertSetlistService.handleConcertSetlistStatus(newConcertId, status);
+            return ResponseEntity.ok(Map.of("message", "Concert status updated successfully."));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "An error occurred while updating concert status."));
+        }
+    }
+
+    // JSON 변환 유틸리티
+    private Map<String, Object> parseSetlistLine(String line, Artist artistId) {
+        try {
             String[] parts = line.split("\\. ", 2);
 
-            // 첫 번째 부분을 숫자로 변환 가능 여부 확인
             if (parts.length < 2 || !isNumeric(parts[0].trim())) {
                 System.err.println("Invalid line format: " + line);
                 return null;
             }
 
-            // 순서와 제목 파싱
             int order = Integer.parseInt(parts[0].trim());
             String trimmedTitle = parts[1].trim();
 
-            // 곡 정보 조회
-            Optional<Song> songOpt = songRepository.findByTitleAndArtistId(trimmedTitle, artistId);
+            // 변경된 메서드 사용
+            Optional<Song> songOpt = songRepository.findFirstByTitleAndArtistId(trimmedTitle, artistId);
 
             Map<String, Object> songData = new LinkedHashMap<>();
             songData.put("title", trimmedTitle);
@@ -175,7 +234,6 @@ public class SetlistApiController {
         }
     }
 
-    // 유틸리티: 숫자 여부 확인
     private boolean isNumeric(String str) {
         try {
             Integer.parseInt(str);

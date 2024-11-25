@@ -3,10 +3,9 @@ package com.bopcon.backend.service;
 import com.bopcon.backend.domain.*;
 import com.bopcon.backend.dto.PastConcertDTO;
 import com.bopcon.backend.dto.SetlistDTO;
-import com.bopcon.backend.repository.ArtistRepository;
-import com.bopcon.backend.repository.PastConcertRepository;
-import com.bopcon.backend.repository.SongRepository;
-import com.bopcon.backend.repository.ConcertSetlistRepository;
+import com.bopcon.backend.repository.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,33 +16,35 @@ import me.kimminhyuk.SolarClient; // SolarClient 클래스
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
+
 @Service
-public class ConcertSetlistService {
+public class    ConcertSetlistService {
 
     private final PastConcertRepository pastConcertRepository;
     private final SongRepository songRepository;
     private final ConcertSetlistRepository concertSetlistRepository;
     private final ArtistRepository artistRepository;
-    private final SolarClient solarClient; // SolarClient 추가
-
-
+    private final NewConcertRepository newConcertRepository;
+    private final SolarClient solarClient;
 
     @Autowired
     public ConcertSetlistService(PastConcertRepository pastConcertRepository,
                                  SongRepository songRepository,
                                  ConcertSetlistRepository concertSetlistRepository,
-                                 ArtistRepository artistRepository
-                                 ) {
+                                 ArtistRepository artistRepository,
+                                 NewConcertRepository newConcertRepository) {
         this.pastConcertRepository = pastConcertRepository;
         this.songRepository = songRepository;
         this.concertSetlistRepository = concertSetlistRepository;
         this.artistRepository = artistRepository;
+        this.newConcertRepository = newConcertRepository;
         this.solarClient = new SolarClient();
-
     }
+
+    private static final Logger log = LoggerFactory.getLogger(PastConcertService.class);
+
 
     /**
      * Solar API를 사용하여 특정 아티스트의 예상 셋리스트 생성
@@ -92,190 +93,180 @@ public class ConcertSetlistService {
                 .doOnError(error -> System.err.println("예상 셋리스트 생성 중 오류 발생: " + error.getMessage()));
     }
 
-
-
-
-
     /**
-     * 특정 PastConcert의 셋리스트를 가져옵니다.
+     * 특정 NewConcert의 Setlist 삭제
      *
-     * @param pastConcert 과거 콘서트 ID
-     * @return 셋리스트에 포함된 곡 제목 목록
+     * @param newConcert NewConcert ID
      */
     @Transactional
-    public List<SetlistDTO> getSetlistByPastConcertId(PastConcert pastConcert) {
-        return concertSetlistRepository.findByPastConcert_PastConcertIdOrderByOrder(pastConcert.getPastConcertId())
+    public void deleteSetlistForConcert(Long newConcert) {
+        concertSetlistRepository.deleteByNewConcertId(newConcert);
+    }
+
+    /**
+     * 특정 NewConcert의 Setlist 저장
+     *
+     * @param newConcert NewConcert 객체
+     * @param setlistJson 예상 셋리스트 데이터
+     */
+    @Transactional
+    public void savePredictedSetlistToDatabase(NewConcert newConcert, List<Map<String, Object>> setlistJson) {
+        // 1. 기존 Setlist 삭제
+        deleteSetlistForConcert(newConcert.getNewConcertId());
+
+        // 2. 셋리스트에서 곡 제목 추출
+        List<String> songTitles = setlistJson.stream()
+                .map(songData -> (String) songData.get("title"))
+                .distinct() // 중복 제거
+                .collect(Collectors.toList());
+
+        // 3. 데이터베이스에서 기존 곡들 조회
+        Map<String, Song> existingSongs = songRepository
+                .findAllByArtistIdAndTitleIn(newConcert.getArtistId().getArtistId(), songTitles)
                 .stream()
-                .map(setlist -> new SetlistDTO(
-                        setlist.getOrder(),
-                        setlist.getSongId().getTitle()
-                ))
+                .collect(Collectors.toMap(
+                        Song::getTitle,
+                        song -> song,
+                        (song1, song2) -> song1 // 중복 키 발생 시 첫 번째 곡 유지
+                ));
+
+        // 4. 새로운 곡 추가
+        List<Song> newSongs = songTitles.stream()
+                .filter(title -> !existingSongs.containsKey(title)) // 기존에 없는 곡만 필터링
+                .map(title -> Song.builder()
+                        .artistId(newConcert.getArtistId())
+                        .title(title)
+                        .count(0) // 초기 count 값
+                        .ytLink(null)
+                        .build())
                 .toList();
-    }
 
+        // 5. 새 곡을 DB에 저장
+        List<Song> savedNewSongs = songRepository.saveAll(newSongs);
 
+        // 6. 모든 곡을 합친 Map 생성
+        Map<String, Song> allSongs = new HashMap<>(existingSongs);
+        savedNewSongs.forEach(song -> allSongs.put(song.getTitle(), song));
 
-    /**
-     * 특정 아티스트의 mbid를 통해 과거 콘서트를 가져옵니다.
-     *
-     * @param mbid 아티스트 mbid
-     * @return 해당 아티스트의 과거 콘서트 목록
-     */
-    public List<PastConcert> getPastConcertsByArtistMbid(String mbid) {
-        return pastConcertRepository.findByArtistId_Mbid(mbid);
-    }
+        // 7. ConcertSetlist 생성 및 저장
+        List<ConcertSetlist> setlists = setlistJson.stream()
+                .filter(songData -> allSongs.containsKey(songData.get("title"))) // 유효한 곡만 필터링
+                .map(songData -> {
+                    String title = (String) songData.get("title");
+                    Song song = allSongs.get(title); // Map에서 Song 가져오기
+                    int order = (int) songData.getOrDefault("order", 0);
 
-    /**
-     * 새로운 곡을 추가하거나 기존 곡의 재생 횟수를 증가시킵니다.
-     *
-     * @param artistId 아티스트 ID
-     * @param songTitle 곡 제목
-     * @return 저장된 Song 엔티티
-     */
-    @Transactional
-    public Song saveOrUpdateSong(Artist artistId, String songTitle) {
-        Optional<Song> existingSong = songRepository.findByArtistIdAndTitle(artistId, songTitle);
+                    return ConcertSetlist.builder()
+                            .newConcert(newConcert)
+                            .song(song)
+                            .order(order)
+                            .build();
+                })
+                .toList();
 
-        if (existingSong.isPresent()) {
-            Song song = existingSong.get();
-            song.incrementCount();
-            return songRepository.save(song);
-        } else {
-            Song newSong = Song.builder()
-                    .artistId(artistId)
-                    .title(songTitle)
-                    .count(1)
-                    .build();
-            return songRepository.save(newSong);
-        }
+        // 저장
+        concertSetlistRepository.saveAll(setlists);
     }
 
     /**
-     * 특정 PastConcert에 곡들을 추가합니다.
+     * NewConcert의 상태에 따른 Setlist 처리
      *
-     * @param pastConcertId 과거 콘서트 ID
-     * @param songTitles 곡 제목 리스트
+     * @param newConcertId NewConcert ID
+     * @param concertStatus       Concert 상태 (UPCOMING 또는 COMPLETE)
      */
     @Transactional
-    public void addSongsToPastConcert(Long pastConcertId, List<String> songTitles) {
-        // 1. 과거 콘서트 가져오기
-        Optional<PastConcert> optionalPastConcert = pastConcertRepository.findById(pastConcertId);
-
-        if (optionalPastConcert.isEmpty()) {
-            throw new IllegalArgumentException("PastConcert with ID " + pastConcertId + " not found.");
+    public void handleConcertSetlistStatus(Long newConcertId, NewConcert.ConcertStatus concertStatus) {
+        if (concertStatus == null) {
+            throw new IllegalArgumentException("Concert status cannot be null");
         }
 
-        PastConcert pastConcert = optionalPastConcert.get();
+        NewConcert concert = newConcertRepository.findById(newConcertId)
+                .orElseThrow(() -> new IllegalArgumentException("NewConcert with ID " + newConcertId + " not found."));
 
-        // 2. 곡 저장 또는 업데이트 후 ConcertSetlist 테이블에 추가
-        int order = 1; // 곡의 순서를 저장하기 위한 변수
-        for (String songTitle : songTitles) {
-            // 곡 추가 또는 업데이트
-            Song song = saveOrUpdateSong(pastConcert.getArtistId(), songTitle);
+        // 상태를 변경하기 전에 로그 추가
+        log.info("Updating concert status for ID {}: {}", newConcertId, concertStatus);
 
-            // ConcertSetlist에 저장
-            ConcertSetlist concertSetlist = ConcertSetlist.builder()
-                    .pastConcert(pastConcert)  // PastConcert와 연관
-                    .song(song)                // Song과 연관
-                    .order(order++)            // 곡 순서
-                    .build();
-
-            // ConcertSetlist 저장
-            concertSetlistRepository.save(concertSetlist);
+        if (concertStatus == NewConcert.ConcertStatus.COMPLETED) {
+            deleteSetlistForConcert(newConcertId);
         }
+
+        concert.setConcertStatus(concertStatus);
+        newConcertRepository.save(concert);
     }
 
+
+
+
     /**
-     * 특정 아티스트의 PastConcert와 셋리스트를 조회합니다.
+     * 특정 아티스트의 과거 콘서트 셋리스트를 가져옵니다.
      *
      * @param artistId 아티스트 ID
-     * @return 콘서트 및 셋리스트 정보
+     * @return PastConcertDTO 리스트
      */
-
+    @Transactional(readOnly = true)
     public List<PastConcertDTO> getSetlistsByArtistId(Long artistId) {
+        // 1. 특정 아티스트의 과거 콘서트를 조회합니다.
         List<PastConcert> pastConcerts = pastConcertRepository.findByArtistId_ArtistId(artistId);
 
         if (pastConcerts.isEmpty()) {
             throw new IllegalArgumentException("No concerts found for the given artist ID.");
         }
 
+        // 2. PastConcert 엔티티를 DTO로 변환합니다.
         return pastConcerts.stream().map(concert -> {
             PastConcertDTO concertDTO = new PastConcertDTO();
             concertDTO.setPastConcertId(concert.getPastConcertId());
             concertDTO.setVenueName(concert.getVenueName());
             concertDTO.setCityName(concert.getCityName());
-            concertDTO.setDate(concert.getDate().toLocalDate().toString());
+            concertDTO.setDate(concert.getDate().toString());
 
+            // 셋리스트를 DTO로 변환
             List<SetlistDTO> setlists = concert.getSetlists().stream()
-                    .map(setlist -> new SetlistDTO(setlist.getOrder(), setlist.getSongId().getTitle()))
+                    .map(setlist -> new SetlistDTO(
+                            setlist.getOrder(), // 순서
+                            setlist.getSongId().getTitle(), // 곡 제목
+                            setlist.getSongId().getSongId(), // 고유 번호
+                            setlist.getSongId().getYtLink() // YouTube 링크
+                    ))
                     .toList();
+
 
             concertDTO.setSetlists(setlists);
             return concertDTO;
         }).toList();
     }
 
-
-
-
+    @Transactional(readOnly = true)
     public PastConcert findPastConcertById(Long pastConcertId) {
         return pastConcertRepository.findById(pastConcertId)
                 .orElseThrow(() -> new IllegalArgumentException("PastConcert with ID " + pastConcertId + " not found."));
     }
 
-
-    public Song getSongByTitleAndArtistId(String title, Long artistId) {
-        return songRepository.findByArtistIdAndTitle1(artistId, title)
-                .orElseThrow(() -> new IllegalArgumentException("Song with title '" + title + "' not found for artist ID " + artistId));
-    }
-
-
-
-
-
-    @Transactional
-    public void savePredictedSetlistToDatabase(NewConcert newConcert, List<Map<String, Object>> setlistJson) {
-        // 곡 제목 목록 수집
-        List<String> songTitles = setlistJson.stream()
-                .map(songData -> (String) songData.get("title"))
-                .collect(Collectors.toList());
-
-        // 기존 곡들을 한 번의 쿼리로 조회하여 캐싱
-        Map<String, Song> existingSongs = songRepository
-                .findAllByArtistIdAndTitleIn(newConcert.getArtistId().getArtistId(), songTitles)
+    @Transactional(readOnly = true)
+    public List<SetlistDTO> getSetlistByPastConcertId(Long pastConcert) {
+        return concertSetlistRepository.findByPastConcert_PastConcertIdOrderByOrder(pastConcert)
                 .stream()
-                .collect(Collectors.toMap(Song::getTitle, song -> song));
-
-        // 순서를 위한 변수
-        int order = 1;
-
-        // 예상 셋리스트 저장
-        for (Map<String, Object> songData : setlistJson) {
-            String title = (String) songData.get("title");
-
-            // 기존 곡 또는 새 곡 생성
-            Song song = existingSongs.getOrDefault(title,
-                    songRepository.save(
-                            Song.builder()
-                                    .artistId(newConcert.getArtistId())
-                                    .title(title)
-                                    .count(0)
-                                    .ytLink(null) // YouTube 링크는 초기화
-                                    .build()
-                    ));
-
-            // ConcertSetlist 생성 및 저장
-            ConcertSetlist setlist = ConcertSetlist.builder()
-                    .newConcert(newConcert) // NewConcert와 연관
-                    .song(song)             // Song과 연관
-                    .order(order++)         // 순서 저장
-                    .build();
-
-            concertSetlistRepository.save(setlist);
-        }
+                .map(setlist -> new SetlistDTO(
+                        setlist.getOrder(),
+                        setlist.getSongId().getTitle(), // 곡 제목
+                        setlist.getSongId().getSongId(), // 고유 번호
+                        setlist.getSongId().getYtLink() // YouTube 링크
+                ))
+                .toList();
     }
 
-
+    @Transactional(readOnly = true)
+    public List<SetlistDTO> getSetlistByNewConcertId(Long newConcertId) {
+        return concertSetlistRepository.findByNewConcert_NewConcertIdOrderByOrder(newConcertId)
+                .stream()
+                .map(setlist -> new SetlistDTO(
+                        setlist.getOrder(),
+                        setlist.getSongId().getTitle(), // 곡 제목
+                        setlist.getSongId().getSongId(), // 고유 번호
+                        setlist.getSongId().getYtLink() // YouTube 링크
+                ))
+                .toList();
+    }
 
 
 }

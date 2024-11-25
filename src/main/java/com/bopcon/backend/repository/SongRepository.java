@@ -25,6 +25,10 @@ public interface SongRepository extends JpaRepository<Song, Long> {
 
     List<Song> findAllByArtistId(Artist artistId);
 
+    Optional<Song> findFirstByTitleAndArtistId(String title, Artist artist);
+
+
+
 
 
 
