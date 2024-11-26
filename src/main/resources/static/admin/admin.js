@@ -207,7 +207,16 @@ document.getElementById('new-concert-form').addEventListener('submit', async (e)
         genre: document.getElementById('genre').value || null,
         concertStatus: document.getElementById('concert-status').value,
     };
-    await fetchConcertAPI('/api/admin/new-concert', 'POST', formData);
+    try {
+        await fetchConcertAPI('/api/admin/new-concert', 'POST', formData);
+        alert('Concert added successfully!');
+
+        // 폼 필드 초기화
+        document.getElementById('new-concert-form').reset();
+    } catch (err) {
+        console.error('Error adding concert:', err);
+        alert('Failed to add concert.');
+    }
 });
 
 // 콘서트 수정 폼 표시
