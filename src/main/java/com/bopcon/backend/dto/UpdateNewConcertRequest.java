@@ -1,7 +1,5 @@
 package com.bopcon.backend.dto;
 
-
-import com.bopcon.backend.domain.Artist;
 import com.bopcon.backend.domain.NewConcert;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +11,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Getter
 public class UpdateNewConcertRequest {
-    private Artist artistId;
+    private Long artistId;
     private String title;
     private String subTitle;
     private LocalDate date;
@@ -26,4 +24,5 @@ public class UpdateNewConcertRequest {
     private String posterUrl; // 포스터
     private String genre;
     private NewConcert.ConcertStatus concertStatus;
+
 }

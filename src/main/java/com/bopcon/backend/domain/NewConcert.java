@@ -27,7 +27,7 @@ public class NewConcert {
 
     @ManyToOne
     @JoinColumn(name = "artist_id")
-    private Artist artistId;
+    private Artist artist;
 
     @Column(name = "title", nullable = false, length = 100)
     private String title;
@@ -67,6 +67,10 @@ public class NewConcert {
     @OneToMany(mappedBy = "newConcert", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Favorite> favorites = new ArrayList<>();
 
+    public Artist getArtistId() {
+        return artist;
+    }
+
 
     public enum ConcertStatus {
         UPCOMING,
@@ -78,7 +82,7 @@ public class NewConcert {
                       String venueName, String cityName, String countryName,
                       String countryCode, String ticketPlatforms, String ticketUrl,
                       String posterUrl, String genre, ConcertStatus concertStatus){
-        this.artistId = artistId;
+        this.artist = artistId;
         this.title = title;
         this.subTitle = subTitle;
         this.date = date;
@@ -93,8 +97,8 @@ public class NewConcert {
         this.concertStatus = concertStatus;
     }
     // 뉴콘서트 정보 수정 메서드
-    public void updateNewConcert(UpdateNewConcertRequest request) {
-        this.artistId = request.getArtistId();
+    public void updateNewConcert(UpdateNewConcertRequest request,Artist artist) {
+        this.artist = artist;
         this.title = request.getTitle();
         this.subTitle = request.getSubTitle();
         this.date = request.getDate();
@@ -108,4 +112,13 @@ public class NewConcert {
         this.genre = request.getGenre();
         this.concertStatus = request.getConcertStatus();
     }
+
+    public ConcertStatus getConcertStatus() {
+        return concertStatus;
+    }
+
+    public void setConcertStatus(NewConcert.ConcertStatus concertStatus) {
+        this.concertStatus = concertStatus;
+    }
+
 }
