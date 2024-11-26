@@ -37,8 +37,10 @@ public class NewConcertService {
     public NewConcert update(long newConcertId, UpdateNewConcertRequest request){
         NewConcert newConcert = newConcertRepository.findById(newConcertId)
                 .orElseThrow(()-> new IllegalArgumentException("not found: "+ newConcertId));
+        Artist artist = artistRepository.findById(request.getArtistId())
+                .orElseThrow(() -> new EntityNotFoundException("Artist not found"));
 
-        newConcert.updateNewConcert(request);
+        newConcert.updateNewConcert(request, artist);
         return newConcert;
     }
 
