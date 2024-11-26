@@ -26,4 +26,5 @@ public class UpdateNewConcertRequest {
     private String posterUrl; // 포스터
     private String genre;
     private NewConcert.ConcertStatus concertStatus;
+
 }

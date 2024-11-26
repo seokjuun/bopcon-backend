@@ -47,6 +47,28 @@
             <button type="submit">Add Artist</button>
         </form>
 
+        <!-- Edit Artist Form -->
+        <section id="edit-artist-section" style="display: none;">
+            <h3>Edit Artist</h3>
+            <form id="edit-artist-form">
+                <input type="hidden" id="edit-artist-id">
+                <label for="edit-mbid">MBID:</label>
+                <input type="text" id="edit-mbid" name="mbid" required>
+                <label for="edit-name">Name:</label>
+                <input type="text" id="edit-name" name="name" required>
+                <label for="edit-krName">Korean Name:</label>
+                <input type="text" id="edit-krName" name="krName">
+                <label for="edit-imgUrl">Image URL:</label>
+                <input type="url" id="edit-imgUrl" name="imgUrl">
+                <label for="edit-snsUrl">SNS URL:</label>
+                <input type="url" id="edit-snsUrl" name="snsUrl">
+                <label for="edit-mediaUrl">Media URL:</label>
+                <input type="url" id="edit-mediaUrl" name="mediaUrl">
+                <button type="submit">Update Artist</button>
+                <button type="button" class="cancel-edit">Cancel</button>
+            </form>
+        </section>
+
         <!-- Artist List -->
         <h3>Existing Artists</h3>
         <table id="artist-table" border="1">
@@ -56,6 +78,9 @@
                 <th>Name</th>
                 <th>Korean Name</th>
                 <th>MBID</th>
+                <th>Img</th>
+                <th>Sns</th>
+                <th>Media</th>
                 <th>Actions</th>
             </tr>
             </thead>
@@ -63,7 +88,109 @@
             <!-- Data to be populated dynamically -->
             </tbody>
         </table>
+
+
     </section>
+    <br/>
+    <hr>
+    <br/>
+    <section id="new-concert-section">
+        <h3>Manage New Concerts</h3>
+
+        <!-- New Concert Form -->
+        <form id="new-concert-form">
+            <h4>Register New Concert</h4>
+            <label for="artist-id">Artist ID:</label>
+            <input type="number" id="artist-id" name="artistId" required>
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" required>
+            <label for="sub-title">Subtitle:</label>
+            <input type="text" id="sub-title" name="subTitle">
+            <label for="date">Date:</label>
+            <input type="date" id="date" name="date" required>
+            <label for="venue-name">Venue Name:</label>
+            <input type="text" id="venue-name" name="venueName" required>
+            <label for="city-name">City Name:</label>
+            <input type="text" id="city-name" name="cityName" required>
+            <label for="country-name">Country Name:</label>
+            <input type="text" id="country-name" name="countryName" required>
+            <label for="country-code">Country Code:</label>
+            <input type="text" id="country-code" name="countryCode" required>
+            <label for="ticket-platforms">Ticket Platforms:</label>
+            <input type="text" id="ticket-platforms" name="ticketPlatforms">
+            <label for="ticket-url">Ticket URL:</label>
+            <input type="url" id="ticket-url" name="ticketUrl">
+            <label for="poster-url">Poster URL:</label>
+            <input type="url" id="poster-url" name="posterUrl">
+            <label for="genre">Genre:</label>
+            <input type="text" id="genre" name="genre">
+            <label for="concert-status">Concert Status:</label>
+            <select id="concert-status" name="concertStatus" required>
+                <option value="UPCOMING">Upcoming</option>
+                <option value="COMPLETED">Completed</option>
+            </select>
+            <button type="submit">Register Concert</button>
+        </form>
+
+        <!-- Edit Concert Form -->
+        <section id="edit-concert-section" style="display: none;">
+            <h3>Edit Concert</h3>
+            <form id="edit-concert-form">
+                <input type="hidden" id="edit-concert-id">
+                <label for="edit-artist-id">Artist ID:</label>
+                <input type="number" id="edit-concert-artistId" name="artistId" required>
+                <label for="edit-title">Title:</label>
+                <input type="text" id="edit-title" name="title" required>
+                <label for="edit-sub-title">Subtitle:</label>
+                <input type="text" id="edit-sub-title" name="subTitle">
+                <label for="edit-date">Date:</label>
+                <input type="date" id="edit-date" name="date" required>
+                <label for="edit-venue-name">Venue Name:</label>
+                <input type="text" id="edit-venue-name" name="venueName" required>
+                <label for="edit-city-name">City Name:</label>
+                <input type="text" id="edit-city-name" name="cityName" required>
+                <label for="edit-country-name">Country Name:</label>
+                <input type="text" id="edit-country-name" name="countryName" required>
+                <label for="edit-country-code">Country Code:</label>
+                <input type="text" id="edit-country-code" name="countryCode" required>
+                <label for="edit-ticket-platforms">Ticket Platforms:</label>
+                <input type="text" id="edit-ticket-platforms" name="ticketPlatforms">
+                <label for="edit-ticket-url">Ticket URL:</label>
+                <input type="url" id="edit-ticket-url" name="ticketUrl">
+                <label for="edit-poster-url">Poster URL:</label>
+                <input type="url" id="edit-poster-url" name="posterUrl">
+                <label for="edit-genre">Genre:</label>
+                <input type="text" id="edit-genre" name="genre">
+                <label for="edit-concert-status">Concert Status:</label>
+                <select id="edit-concert-status" name="concertStatus" required>
+                    <option value="UPCOMING">Upcoming</option>
+                    <option value="COMPLETED">Completed</option>
+                </select>
+                <button type="submit">Update Concert</button>
+                <button type="button" class="cancel-edit">Cancel</button>
+            </form>
+        </section>
+
+        <!-- Concert List -->
+        <h4>Existing Concerts</h4>
+        <table id="concert-table" border="1">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Artist ID</th>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Venue</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Data to be dynamically loaded -->
+            </tbody>
+        </table>
+    </section>
+
+
 </div>
 
 <!-- Include external JavaScript -->
