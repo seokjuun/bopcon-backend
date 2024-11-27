@@ -95,8 +95,8 @@ public class NewConcert {
         this.concertStatus = concertStatus;
     }
     // 뉴콘서트 정보 수정 메서드
-    public void updateNewConcert(UpdateNewConcertRequest request) {
-        this.artist = request.getArtistId();
+    public void updateNewConcert(UpdateNewConcertRequest request,Artist artist) {
+        this.artist = artist;
         this.title = request.getTitle();
         this.subTitle = request.getSubTitle();
         this.date = request.getDate();
