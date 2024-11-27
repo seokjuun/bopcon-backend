@@ -12,20 +12,26 @@ import java.util.Optional;
 
 @Repository
 public interface SongRepository extends JpaRepository<Song, Long> {
+
+
+    // 특정 Song 제목으로 Song 조회
     Optional<Song> findByTitle(String title); // 아티스트 ID와 곡 제목으로 검색
 
-    @Query("SELECT s FROM Song s WHERE s.title = :title AND s.artistId.artistId = :artistId")
-    Optional<Song> findByTitleAndArtistId(@Param("title") String title, @Param("artistId") Long artistId);
-    // 아티스트 이름과 곡 제목으로 노래 조회
-    Optional<Song> findByArtistIdAndTitle(Artist artist, String title);
 
-    // 새로운 메서드 - 숫자 '1'을 포함 (Artist ID를 Long 타입으로 사용)
-    @Query("SELECT s FROM Song s WHERE s.artistId.artistId = :artistId AND s.title = :title")
-    Optional<Song> findByArtistIdAndTitle1(@Param("artistId") Long artistId, @Param("title") String title);
 
     List<Song> findAllByArtistId(Artist artistId);
 
-    Optional<Song> findFirstByTitleAndArtistId(String title, Artist artist);
+    Optional<Song> findFirstByTitleAndArtistId(String title, Artist artistId);
+
+    // artistId를 기반으로 Song 개수 조회
+    long countByArtistId(Artist artistId);
+
+    // artistId를 기반으로 Song 리스트 조회
+    List<Song> findByArtistId(Artist artistId);
+
+    // 특정 title과 artistId로 Song 검색
+    Optional<Song> findByTitleAndArtistId(String title, Artist artistId);
+
 
 
 

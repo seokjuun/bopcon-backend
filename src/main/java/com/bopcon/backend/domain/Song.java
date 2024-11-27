@@ -1,6 +1,5 @@
 package com.bopcon.backend.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -9,8 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.Objects;
-
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 @Entity
 @Getter
@@ -38,12 +35,14 @@ public class Song {
 
 
     // 정적 팩토리 메서드
-    public static Song create(String title) {
+    public static Song create(String title, Artist artistId) {
         Song song = new Song();
         song.setTitle(title);
         song.setCount(0); // 초기 count 값
+        song.setArtist(artistId); // Artist 설정
         return song;
     }
+
 
     @Builder
     public Song(Artist artistId, String title, Integer count, String ytLink) {
@@ -92,5 +91,13 @@ public class Song {
    }
    public void setTitle(String title) {
         this.title = title;
+   }
+
+   public Artist getArtist() {
+        return artistId;
+   }
+
+   public void setArtist(Artist artistId) {
+        this.artistId = artistId;
    }
 }
