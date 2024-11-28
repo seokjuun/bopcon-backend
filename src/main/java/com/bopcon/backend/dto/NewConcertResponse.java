@@ -49,6 +49,7 @@ public class NewConcertResponse {
     // 기존 엔티티 생성자를 유지하는 경우
     public NewConcertResponse(NewConcert newConcert) {
         this.newConcertId = newConcert.getNewConcertId();
+        this.artistId = newConcert.getArtist().getArtistId(); // 처음 get 은 아티스트 객체를 가져오고 두번째는 아이드를 가져옴
         this.artistId = newConcert.getArtistId() != null ? newConcert.getArtistId().getArtistId() : null; // Null 처리
         this.title = newConcert.getTitle();
         this.subTitle = newConcert.getSubTitle();
