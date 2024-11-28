@@ -84,4 +84,23 @@ public class FavoriteService {
                 })
                 .collect(Collectors.toList());
     }
+
+
+    // 아티스트 즐겨찾기 여부 확인
+    @Transactional(readOnly = true)
+    public boolean isArtistFavorite(User user, Long artistId) {
+        return favoriteRepository.findByUserAndArtist(user,
+                artistRepository.findById(artistId)
+                        .orElseThrow(() -> new IllegalArgumentException("아티스트를 찾을 수 없습니다."))
+        ).isPresent();
+    }
+
+    // 콘서트 즐겨찾기 여부 확인
+    @Transactional(readOnly = true)
+    public boolean isConcertFavorite(User user, Long concertId) {
+        return favoriteRepository.findByUserAndNewConcert(user,
+                newConcertRepository.findById(concertId)
+                        .orElseThrow(() -> new IllegalArgumentException("콘서트를 찾을 수 없습니다."))
+        ).isPresent();
+    }
 }

@@ -1,6 +1,7 @@
 package com.bopcon.backend.controller;
 
 import com.bopcon.backend.domain.User;
+import com.bopcon.backend.dto.FavoriteCheckResponse;
 import com.bopcon.backend.dto.FavoriteRequest;
 import com.bopcon.backend.dto.FavoriteResponse;
 import com.bopcon.backend.service.FavoriteService;
@@ -53,5 +54,29 @@ public class FavoriteController {
     public ResponseEntity<List<FavoriteResponse>> getUserFavorites(@AuthenticationPrincipal User user) {
         List<FavoriteResponse> favorites = favoriteService.getFavorites(user);
         return ResponseEntity.ok(favorites);
+    }
+
+    // 아티스트 즐겨찾기 여부 확인
+    @GetMapping("/api/favorites/artist/{artistId}/check")
+    public ResponseEntity<FavoriteCheckResponse> checkArtistFavorite(
+            @PathVariable Long artistId,
+            @AuthenticationPrincipal User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User is not authenticated.");
+        }
+        boolean isFavorite = favoriteService.isArtistFavorite(user, artistId);
+        return ResponseEntity.ok(new FavoriteCheckResponse(isFavorite));
+    }
+
+    // 콘서트 즐겨찾기 여부 확인
+    @GetMapping("/api/favorites/concert/{concertId}/check")
+    public ResponseEntity<FavoriteCheckResponse> checkConcertFavorite(
+            @PathVariable Long concertId,
+            @AuthenticationPrincipal User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User is not authenticated.");
+        }
+        boolean isFavorite = favoriteService.isConcertFavorite(user, concertId);
+        return ResponseEntity.ok(new FavoriteCheckResponse(isFavorite));
     }
 }
