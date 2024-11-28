@@ -1,21 +1,18 @@
 package com.bopcon.backend.domain;
 
-
 import com.bopcon.backend.dto.UpdateNewConcertRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Date;
 
-@EntityListeners(AuditingEntityListener.class) // 엔티티의 생성 및 수정 시간을 자동으로 감시하고 기록
+@EntityListeners(AuditingEntityListener.class)
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -26,7 +23,7 @@ public class NewConcert {
     private Long newConcertId;
 
     @ManyToOne
-    @JoinColumn(name = "artist_id")
+    @JoinColumn(name = "artist_id", nullable = false)
     private Artist artist;
 
     @Column(name = "title", nullable = false, length = 100)
@@ -39,38 +36,35 @@ public class NewConcert {
     private LocalDate date;
 
     @Column(name = "venue_name", nullable = false, length = 100)
-    private String venueName; // 공연장
+    private String venueName;
 
     @Column(name = "city_name", nullable = false, length = 50)
     private String cityName;
 
     @Column(name = "country_name", nullable = false, length = 50)
-    private String countryName; // ex) Republic of Korea
+    private String countryName;
 
     @Column(name = "country_code", nullable = false, length = 5)
-    private String countryCode; // ex) Kr
+    private String countryCode;
 
     @Column(name = "ticket_platforms", length = 255)
     private String ticketPlatforms;
 
     @Column(name = "ticket_url", length = 255)
     private String ticketUrl;
+
     @Column(name = "poster_url", length = 255)
-    private String posterUrl; // 포스터
+    private String posterUrl;
+
     @Column(name = "genre", length = 50)
     private String genre;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "concert_status", nullable = false)
-    private NewConcert.ConcertStatus concertStatus;
+    private ConcertStatus concertStatus;
 
     @OneToMany(mappedBy = "newConcert", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Favorite> favorites = new ArrayList<>();
-
-    public Artist getArtistId() {
-        return artist;
-    }
-
 
     public enum ConcertStatus {
         UPCOMING,
@@ -78,11 +72,11 @@ public class NewConcert {
     }
 
     @Builder
-    public NewConcert(Artist artistId, String title, String subTitle, LocalDate date,
+    public NewConcert(Artist artist, String title, String subTitle, LocalDate date,
                       String venueName, String cityName, String countryName,
                       String countryCode, String ticketPlatforms, String ticketUrl,
-                      String posterUrl, String genre, ConcertStatus concertStatus){
-        this.artist = artistId;
+                      String posterUrl, String genre, ConcertStatus concertStatus) {
+        this.artist = artist;
         this.title = title;
         this.subTitle = subTitle;
         this.date = date;
@@ -96,8 +90,9 @@ public class NewConcert {
         this.genre = genre;
         this.concertStatus = concertStatus;
     }
-    // 뉴콘서트 정보 수정 메서드
-    public void updateNewConcert(UpdateNewConcertRequest request,Artist artist) {
+
+    // Update 메서드
+    public void updateNewConcert(UpdateNewConcertRequest request, Artist artist) {
         this.artist = artist;
         this.title = request.getTitle();
         this.subTitle = request.getSubTitle();
@@ -113,12 +108,13 @@ public class NewConcert {
         this.concertStatus = request.getConcertStatus();
     }
 
-    public ConcertStatus getConcertStatus() {
-        return concertStatus;
+    // Artist 설정 메서드
+    public void setArtist(Artist artist) {
+        this.artist = artist;
     }
 
-    public void setConcertStatus(NewConcert.ConcertStatus concertStatus) {
+    // ConcertStatus 설정 메서드 추가
+    public void setConcertStatus(ConcertStatus concertStatus) {
         this.concertStatus = concertStatus;
     }
-
 }

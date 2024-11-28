@@ -22,9 +22,8 @@ public class NewConcertService {
     private final NewConcertRepository newConcertRepository;
     private final ArtistRepository artistRepository;
 
-    // 뉴 콘서트 추가 메서드
-    @CacheEvict(value = {"allNewConcerts", "newConcertsByGenre"}, allEntries = true) // 관련 캐시 무효화
     // 🔥 뉴 콘서트 추가 메서드
+    @CacheEvict(value = {"allNewConcerts", "newConcertsByGenre"}, allEntries = true) // 캐시 무효화
     public NewConcert save(AddNewConcertRequest request) {
         Artist artist = artistRepository.findById(request.getArtistId())
                 .orElseThrow(() -> new EntityNotFoundException("Artist not found with ID: " + request.getArtistId()));
@@ -33,10 +32,10 @@ public class NewConcertService {
 
     // 🔥 뉴 콘서트 수정 메서드
     @Transactional
-    @CacheEvict(value = {"allNewConcerts", "newConcertsByGenre"}, allEntries = true) // 관련 캐시 무효화
-    public NewConcert update(long newConcertId, UpdateNewConcertRequest request){
+    @CacheEvict(value = {"allNewConcerts", "newConcertsByGenre"}, allEntries = true) // 캐시 무효화
+    public NewConcert update(long newConcertId, UpdateNewConcertRequest request) {
         NewConcert newConcert = newConcertRepository.findById(newConcertId)
-                .orElseThrow(()-> new IllegalArgumentException("not found: "+ newConcertId));
+                .orElseThrow(() -> new IllegalArgumentException("Not found: " + newConcertId));
         Artist artist = artistRepository.findById(request.getArtistId())
                 .orElseThrow(() -> new EntityNotFoundException("Artist not found"));
 
@@ -44,34 +43,36 @@ public class NewConcertService {
         return newConcert;
     }
 
-    // 콘서트 목록 가져오기
+    // 🔥 콘서트 목록 가져오기
     @Cacheable(value = "allNewConcerts", key = "'allConcerts'")
-    public List<NewConcert> findAllNewConcerts(){ return newConcertRepository.findAll(); }
-
-    // 콘서트 (장르 필터) 목록 가져오기
-    @Cacheable(value = "newConcertsByGenre", key = "#genre")
-    public List<NewConcert> findNewConcertsByGenre(String genre){
-        return newConcertRepository.findByGenre(genre);
+    public List<NewConcert> findAllNewConcerts() {
+        return newConcertRepository.findAll();
     }
 
-    // 콘서트 조회
+    // 🔥 콘서트 (장르 필터) 목록 가져오기
+    @Cacheable(value = "newConcertsByGenre", key = "#genre")
+    public List<NewConcert> findNewConcertsByGenre(String genre) {
+        return newConcertRepository.findByGenreContainingIgnoreCase(genre); // 대소문자 무시 검색
+    }
+
+    // 🔥 콘서트 조회
     @Cacheable(value = "singleConcert", key = "#concertId")
-    public NewConcert findByConcertId(long concertId){
+    public NewConcert findByConcertId(long concertId) {
         return newConcertRepository.findById(concertId)
                 .orElseThrow(() -> new IllegalArgumentException("Concert not found with ID: " + concertId));
     }
 
-    // 콘서트 삭제
+    // 🔥 콘서트 삭제
     @CacheEvict(value = {"allNewConcerts", "newConcertsByGenre", "singleConcert"}, allEntries = true)
-    public void delete(long concertId){
+    public void delete(long concertId) {
         newConcertRepository.deleteById(concertId);
     }
 
-    // 아티스트 콘서트 가져오기
+    // 🔥 아티스트 콘서트 가져오기
     @Cacheable(value = "newConcertsByArtist", key = "#artistId")
-    public List<NewConcert> findNewConcertsByArtistId(Long artistId){
+    public List<NewConcert> findNewConcertsByArtistId(Long artistId) {
         Artist artist = artistRepository.findById(artistId)
-                .orElseThrow(()->new IllegalArgumentException("Invalid artistId: "+ artistId));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid artistId: " + artistId));
 
         return newConcertRepository.findByArtist(artist);
     }

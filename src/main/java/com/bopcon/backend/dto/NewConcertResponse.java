@@ -30,7 +30,7 @@ public class NewConcertResponse {
     public static NewConcertResponse fromEntity(NewConcert newConcert) {
         return new NewConcertResponse(
                 newConcert.getNewConcertId(),
-                newConcert.getArtistId() != null ? newConcert.getArtistId().getArtistId() : null, // Null 처리
+                newConcert.getArtist() != null ? newConcert.getArtist().getArtistId() : null, // Null 처리
                 newConcert.getTitle(),
                 newConcert.getSubTitle(),
                 newConcert.getDate(),
@@ -50,7 +50,7 @@ public class NewConcertResponse {
     public NewConcertResponse(NewConcert newConcert) {
         this.newConcertId = newConcert.getNewConcertId();
         this.artistId = newConcert.getArtist().getArtistId(); // 처음 get 은 아티스트 객체를 가져오고 두번째는 아이드를 가져옴
-        this.artistId = newConcert.getArtistId() != null ? newConcert.getArtistId().getArtistId() : null; // Null 처리
+        this.artistId = newConcert.getArtist() != null ? newConcert.getArtist().getArtistId() : null; // Null 처리
         this.title = newConcert.getTitle();
         this.subTitle = newConcert.getSubTitle();
         this.date = newConcert.getDate();

@@ -25,7 +25,7 @@ public class SearchService {
 
         if (artist != null) {
             // 해당 아티스트의 콘서트 정보 반환
-            List<NewConcert> concerts = newConcertRepository.findByArtistId(artist);
+            List<NewConcert> concerts = newConcertRepository.findByArtist(artist);
             return new SearchResponse(artist, concerts);
         }
 

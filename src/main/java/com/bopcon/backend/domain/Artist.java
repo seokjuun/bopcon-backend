@@ -17,6 +17,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Artist {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "artist_id", updatable = false)
@@ -27,27 +28,30 @@ public class Artist {
 
     @Column(name = "name", nullable = false)
     private String name;
+
     @Column(name = "kr_name")
     private String krName;
+
     @Column(name = "img_url")
     private String imgUrl;
+
     @Column(name = "sns_url")
     private String snsUrl;
+
     @Column(name = "media_url")
     private String mediaUrl;
-
-
 
     @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Favorite> favorites = new ArrayList<>();
 
     // NewConcert와의 연관관계 (1:N)
-    @OneToMany(mappedBy = "artistId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<NewConcert> concerts = new ArrayList<>();
 
     @Builder // 빌더 패턴으로 객체 생성
-    public Artist(String mbid, String name, String krName,String imgUrl, String snsUrl, String mediaUrl) {
+    public Artist(String mbid, String name, String krName, String imgUrl, String snsUrl, String mediaUrl) {
         this.mbid = mbid;
         this.name = name;
         this.krName = krName;
@@ -64,5 +68,17 @@ public class Artist {
         this.imgUrl = artist.getImgUrl();
         this.snsUrl = artist.getSnsUrl();
         this.mediaUrl = artist.getMediaUrl();
+    }
+
+    // 콘서트 추가 메서드
+    public void addConcert(NewConcert concert) {
+        concerts.add(concert);
+        concert.setArtist(this); // 양방향 연관관계 설정
+    }
+
+    // 콘서트 삭제 메서드
+    public void removeConcert(NewConcert concert) {
+        concerts.remove(concert);
+        concert.setArtist(null); // 연관관계 해제
     }
 }

@@ -156,7 +156,7 @@ public class SetlistApiController {
             }
 
             // 3. 아티스트 정보 조회
-            Artist artist = newConcert.getArtistId();
+            Artist artist = newConcert.getArtist();
             if (artist == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(Map.of("error", "Artist not associated with NewConcert ID: " + newConcertId));

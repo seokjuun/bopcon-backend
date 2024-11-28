@@ -122,7 +122,7 @@ public class    ConcertSetlistService {
 
         // 3. 데이터베이스에서 기존 곡들 조회
         Map<String, Song> existingSongs = songRepository
-                .findAllByArtistIdAndTitleIn(newConcert.getArtistId().getArtistId(), songTitles)
+                .findAllByArtistIdAndTitleIn(newConcert.getArtist().getArtistId(), songTitles)
                 .stream()
                 .collect(Collectors.toMap(
                         Song::getTitle,
@@ -134,7 +134,7 @@ public class    ConcertSetlistService {
         List<Song> newSongs = songTitles.stream()
                 .filter(title -> !existingSongs.containsKey(title)) // 기존에 없는 곡만 필터링
                 .map(title -> Song.builder()
-                        .artistId(newConcert.getArtistId())
+                        .artistId(newConcert.getArtist())
                         .title(title)
                         .count(0) // 초기 count 값
                         .ytLink(null)

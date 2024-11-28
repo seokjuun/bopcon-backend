@@ -2,7 +2,6 @@ package com.bopcon.backend.dto;
 
 import com.bopcon.backend.domain.Artist;
 import com.bopcon.backend.domain.NewConcert;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +12,7 @@ import java.time.LocalDate;
 @AllArgsConstructor // 모든 필드 값을 파라미터로 받는 생성자 추가
 @Getter
 public class AddNewConcertRequest {
+
     private Long artistId;
     private String title;
     private String subTitle;
@@ -29,7 +29,7 @@ public class AddNewConcertRequest {
 
     public NewConcert toNewConcert(Artist artist) {
         return NewConcert.builder()
-                .artistId(artist)
+                .artist(artist) // artistId -> artist로 수정
                 .title(title)
                 .subTitle(subTitle)
                 .date(date)
