@@ -15,4 +15,6 @@ public interface ArtistRepository extends JpaRepository<Artist, Long> {
     Optional<Artist> findByName(String name);
 
     Optional<Artist> findById(Long id);
+    // 🔥 키워드로 아티스트 검색 (영문/한글 이름)
+    Optional<Artist> findByNameContainingIgnoreCaseOrKrNameContainingIgnoreCase(String name, String krName);
 }

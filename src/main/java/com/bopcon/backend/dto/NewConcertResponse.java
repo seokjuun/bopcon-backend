@@ -1,32 +1,56 @@
 package com.bopcon.backend.dto;
 
-import com.bopcon.backend.domain.Artist;
 import com.bopcon.backend.domain.NewConcert;
-import com.bopcon.backend.service.NewConcertService;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor // Jackson 직렬화를 위한 기본 생성자
 public class NewConcertResponse {
-    private final Long newConcertId;
-    private final Long artistId;
-    private final String title;
-    private final String subTitle;
-    private final LocalDate date;
-    private final String venueName; // 공연장
-    private final String cityName;
-    private final String countryName; // ex) Republic of Korea
-    private final String countryCode; // ex) Kr
-    private final String ticketPlatforms;
-    private final String ticketUrl;
-    private final String posterUrl; // 포스터
-    private final String genre;
-    private final NewConcert.ConcertStatus concertStatus;
+    private Long newConcertId;
+    private Long artistId;
+    private String title;
+    private String subTitle;
+    private LocalDate date;
+    private String venueName; // 공연장
+    private String cityName;
+    private String countryName; // ex) Republic of Korea
+    private String countryCode; // ex) Kr
+    private String ticketPlatforms;
+    private String ticketUrl;
+    private String posterUrl; // 포스터
+    private String genre;
+    private NewConcert.ConcertStatus concertStatus;
 
-    public NewConcertResponse(NewConcert newConcert){
+    // 정적 팩토리 메서드: 엔티티 -> DTO 변환
+    public static NewConcertResponse fromEntity(NewConcert newConcert) {
+        return new NewConcertResponse(
+                newConcert.getNewConcertId(),
+                newConcert.getArtistId() != null ? newConcert.getArtistId().getArtistId() : null, // Null 처리
+                newConcert.getTitle(),
+                newConcert.getSubTitle(),
+                newConcert.getDate(),
+                newConcert.getVenueName(),
+                newConcert.getCityName(),
+                newConcert.getCountryName(),
+                newConcert.getCountryCode(),
+                newConcert.getTicketPlatforms(),
+                newConcert.getTicketUrl(),
+                newConcert.getPosterUrl(),
+                newConcert.getGenre(),
+                newConcert.getConcertStatus()
+        );
+    }
+
+    // 기존 엔티티 생성자를 유지하는 경우
+    public NewConcertResponse(NewConcert newConcert) {
         this.newConcertId = newConcert.getNewConcertId();
         this.artistId = newConcert.getArtist().getArtistId(); // 처음 get 은 아티스트 객체를 가져오고 두번째는 아이드를 가져옴
+        this.artistId = newConcert.getArtistId() != null ? newConcert.getArtistId().getArtistId() : null; // Null 처리
         this.title = newConcert.getTitle();
         this.subTitle = newConcert.getSubTitle();
         this.date = newConcert.getDate();

@@ -18,6 +18,8 @@ import java.util.List;
 public class ArtistService {
     private final ArtistRepository artistRepository;
 
+
+
     // 아티스트 추가 메서드
     @CacheEvict(value = {"allArtists", "singleArtist"}, allEntries = true)
     public Artist save(AddArtistRequest request) {  return artistRepository.save(request.toArtist());}
