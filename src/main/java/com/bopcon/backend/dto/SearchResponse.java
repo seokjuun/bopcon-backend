@@ -9,34 +9,7 @@ import java.util.stream.Collectors;
 
 @Getter
 public class SearchResponse {
-    private final Long artistId; // 아티스트 ID
-    private final String name; // 아티스트 이름
-    private final String krName; // 아티스트 한글 이름
-    private final String imgUrl; // 아티스트 이미지 URL
-    private final String snsUrl; // 아티스트 SNS URL
-    private final List<ConcertResponse> concerts; // 콘서트 정보 리스트
 
-    public SearchResponse(Artist artist, List<NewConcert> concerts) {
-        this.artistId = artist.getArtistId();
-        this.name = artist.getName();
-        this.krName = artist.getKrName();
-        this.imgUrl = artist.getImgUrl();
-        this.snsUrl = artist.getSnsUrl();
-        this.concerts = concerts.stream()
-                .map(ConcertResponse::new)
-                .collect(Collectors.toList());
-    }
-
-    public SearchResponse(List<NewConcert> concerts) {
-        this.artistId = null;
-        this.name = null;
-        this.krName = null;
-        this.imgUrl = null;
-        this.snsUrl = null;
-        this.concerts = concerts.stream()
-                .map(ConcertResponse::new)
-                .collect(Collectors.toList());
-    }
 
     @Getter
     public static class ConcertResponse {
@@ -53,6 +26,11 @@ public class SearchResponse {
         private final String posterUrl;
         private final String genre;
         private final String concertStatus;
+        private final Long artistId;
+        private final String artistName;
+        private final String artistkrName;
+        private final String imgUrl;
+        private final String snsUrl;
 
         public ConcertResponse(NewConcert concert) {
             this.newConcertId = concert.getNewConcertId();
@@ -68,6 +46,11 @@ public class SearchResponse {
             this.posterUrl = concert.getPosterUrl();
             this.genre = concert.getGenre();
             this.concertStatus = concert.getConcertStatus().name();
+            this.artistId = concert.getArtistId().getArtistId();
+            this.artistName = concert.getArtistId().getName();
+            this.artistkrName = concert.getArtistId().getKrName();
+            this.imgUrl = concert.getArtistId().getImgUrl();
+            this.snsUrl = concert.getArtistId().getSnsUrl();
         }
     }
 }

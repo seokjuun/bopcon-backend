@@ -8,10 +8,7 @@ import java.util.List;
 
 public interface NewConcertRepository extends JpaRepository<NewConcert, Long> {
 
-    // 🔥 특정 아티스트의 콘서트 검색
-    List<NewConcert> findByArtistId(Artist artist);
-
-    // 🔥 키워드로 콘서트 검색
+    // 키워드로 타이틀, 공연장 이름, 장르 검색
     List<NewConcert> findByTitleContainingIgnoreCaseOrVenueNameContainingIgnoreCaseOrGenreContainingIgnoreCase(
             String title, String venueName, String genre);
     // 🔍 장르별로 검색
