@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
     List<Favorite> findAllByUser(User user);
 
-    Optional<Favorite> findByUserAndArtist(User user, Artist artist);
+    Optional<Favorite> findByUserAndArtistArtistId(User user, Long artistId);
+    Optional<Favorite> findByUserAndNewConcertNewConcertId(User user, Long concertId);
 
-    Optional<Favorite> findByUserAndNewConcert(User user, NewConcert newConcert);
 }

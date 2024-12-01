@@ -25,29 +25,33 @@ public class FavoriteService {
 
     @Transactional
     public void addArtistFavorite(User user, Long artistId) {
+        if (favoriteRepository.findByUserAndArtistArtistId(user, artistId).isPresent()) {
+            throw new IllegalArgumentException("이미 즐겨찾기에 추가된 아티스트입니다.");
+        }
+
         Artist artist = artistRepository.findById(artistId)
                 .orElseThrow(() -> new IllegalArgumentException("아티스트를 찾을 수 없습니다."));
-        favoriteRepository.findByUserAndArtist(user, artist)
-                .ifPresent(fav -> { throw new IllegalArgumentException("이미 즐겨찾기에 추가된 아티스트입니다."); });
 
         favoriteRepository.save(Favorite.builder().user(user).artist(artist).build());
     }
 
+
     @Transactional
     public void addConcertFavorite(User user, Long concertId) {
-        NewConcert newConcert = newConcertRepository.findById(concertId)
-                .orElseThrow(() -> new IllegalArgumentException("콘서트를 찾을 수 없습니다."));
-        favoriteRepository.findByUserAndNewConcert(user, newConcert)
-                .ifPresent(fav -> { throw new IllegalArgumentException("이미 즐겨찾기에 추가된 콘서트입니다."); });
+        if (favoriteRepository.findByUserAndNewConcertNewConcertId(user, concertId).isPresent()) {
+            throw new IllegalArgumentException("이미 즐겨찾기에 추가된 콘서트입니다.");
+        }
 
-        favoriteRepository.save(Favorite.builder().user(user).newConcert(newConcert).build());
+        NewConcert concert = newConcertRepository.findById(concertId)
+                .orElseThrow(() -> new IllegalArgumentException("콘서트를 찾을 수 없습니다."));
+
+        favoriteRepository.save(Favorite.builder().user(user).newConcert(concert).build());
     }
+
 
     @Transactional
     public void removeArtistFavorite(User user, Long artistId) {
-        Artist artist = artistRepository.findById(artistId)
-                .orElseThrow(() -> new IllegalArgumentException("아티스트를 찾을 수 없습니다."));
-        Favorite favorite = favoriteRepository.findByUserAndArtist(user, artist)
+        Favorite favorite = favoriteRepository.findByUserAndArtistArtistId(user, artistId)
                 .orElseThrow(() -> new IllegalArgumentException("즐겨찾기에 없는 아티스트입니다."));
 
         favoriteRepository.delete(favorite);
@@ -55,13 +59,12 @@ public class FavoriteService {
 
     @Transactional
     public void removeConcertFavorite(User user, Long concertId) {
-        NewConcert concert = newConcertRepository.findById(concertId)
-                .orElseThrow(() -> new IllegalArgumentException("콘서트를 찾을 수 없습니다."));
-        Favorite favorite = favoriteRepository.findByUserAndNewConcert(user, concert)
+        Favorite favorite = favoriteRepository.findByUserAndNewConcertNewConcertId(user, concertId)
                 .orElseThrow(() -> new IllegalArgumentException("즐겨찾기에 없는 콘서트입니다."));
 
         favoriteRepository.delete(favorite);
     }
+
 
     @Transactional(readOnly = true)
     public List<FavoriteResponse> getFavorites(User user) {
@@ -89,18 +92,12 @@ public class FavoriteService {
     // 아티스트 즐겨찾기 여부 확인
     @Transactional(readOnly = true)
     public boolean isArtistFavorite(User user, Long artistId) {
-        return favoriteRepository.findByUserAndArtist(user,
-                artistRepository.findById(artistId)
-                        .orElseThrow(() -> new IllegalArgumentException("아티스트를 찾을 수 없습니다."))
-        ).isPresent();
+        return favoriteRepository.findByUserAndArtistArtistId(user, artistId).isPresent();
     }
 
     // 콘서트 즐겨찾기 여부 확인
     @Transactional(readOnly = true)
     public boolean isConcertFavorite(User user, Long concertId) {
-        return favoriteRepository.findByUserAndNewConcert(user,
-                newConcertRepository.findById(concertId)
-                        .orElseThrow(() -> new IllegalArgumentException("콘서트를 찾을 수 없습니다."))
-        ).isPresent();
+        return favoriteRepository.findByUserAndNewConcertNewConcertId(user, concertId).isPresent();
     }
 }
