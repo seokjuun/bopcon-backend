@@ -43,12 +43,12 @@ public class Artist {
     private List<Favorite> favorites = new ArrayList<>();
 
     // PastConcert와의 연관 관계 추가
-    @OneToMany(mappedBy = "artistId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PastConcert> pastConcerts = new ArrayList<>();
 
     // Song과의 연관 관계 추가
-    @OneToMany(mappedBy = "artistId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Song> Song = new ArrayList<>();
+    @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Song> songs = new ArrayList<>();
 
 
     @Builder // 빌더 패턴으로 객체 생성

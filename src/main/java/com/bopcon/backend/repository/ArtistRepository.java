@@ -12,9 +12,7 @@ public interface ArtistRepository extends JpaRepository<Artist, Long> {
     //mbid로 아티스트를 조회할 수 있도록 메서드
     Optional<Artist> findByMbid(String mbid);
 
-    Optional<Artist> findByName(String name);
 
-    Optional<Artist> findById(Long id);
     // 🔥 키워드로 아티스트 검색 (영문/한글 이름)
     Optional<Artist> findByNameContainingIgnoreCaseOrKrNameContainingIgnoreCase(String name, String krName);
 }

@@ -14,7 +14,7 @@ public class ConcertSetlist {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "concert_setlist_id", nullable = false, updatable = false)
+    @Column(name = "concert_setlist_id", updatable = false)
     private Long concertSetlistId;
 
     @ManyToOne
@@ -23,29 +23,19 @@ public class ConcertSetlist {
 
     @ManyToOne
     @JoinColumn(name = "pastconcert_id", nullable = true) // Nullable로 설정
-    @JsonBackReference // 순환 방지
     private PastConcert pastConcert; // PastConcert와 연관 관계
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "song_id", nullable = false)
-    private Song songId; // Song과 연관 관계
+    private Song song; // Song과 연관 관계
 
     @Column(name = "`order`", nullable = false)
     private Integer order; // 곡 순서
 
-    // 뉴 콘서트와 과거 콘서트 중 하나는 null 값이어야 함
     @Builder
-    public ConcertSetlist(NewConcert newConcert, PastConcert pastConcert, Song song, Integer order) {
-        if ((newConcert != null && pastConcert != null) || (newConcert == null && pastConcert == null)) {
-            throw new IllegalArgumentException("새 콘서트와 과거 콘서트 중 하나는 null 값이어야 함");
-        }
-        this.newConcert = newConcert;
+    public ConcertSetlist(PastConcert pastConcert, Song song, Integer order) {
         this.pastConcert = pastConcert;
-        this.songId = song;
+        this.song = song;
         this.order = order;
-    }
-
-    public Song getSongId() {
-        return songId;
     }
 }

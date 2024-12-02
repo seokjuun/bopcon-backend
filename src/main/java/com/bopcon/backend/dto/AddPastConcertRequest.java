@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor // 기본 생성자
@@ -16,12 +17,12 @@ public class AddPastConcertRequest {
     private String venueName;     // 공연장 이름
     private String cityName;      // 도시 이름
     private String country;       // 국가 이름
-    private LocalDateTime date;   // 공연 날짜 및 시간
+    private LocalDate date;   // 공연 날짜 및 시간
 
     // Request DTO에서 엔티티로 변환하는 메서드
     public PastConcert toPastConcert(Artist artist) {
         return PastConcert.builder()
-                .artistId(artist)
+                .artist(artist)
                 .venueName(venueName)
                 .cityName(cityName)
                 .country(country)

@@ -1,9 +1,7 @@
 package com.bopcon.backend.controller;
 
 import com.bopcon.backend.domain.Artist;
-import com.bopcon.backend.dto.AddArtistRequest;
-import com.bopcon.backend.dto.ArtistResponse;
-import com.bopcon.backend.dto.UpdateArtistRequest;
+import com.bopcon.backend.dto.*;
 import com.bopcon.backend.service.ArtistService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,8 +14,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ArtistApiController {
     private final ArtistService artistService;
-
-
 
     // 등록
     @PostMapping("/api/admin/artist")
@@ -55,5 +51,26 @@ public class ArtistApiController {
         artistService.delete(artistId);
 
         return ResponseEntity.ok().build(); // build() 본문이 없는 응답 생성
+    }
+
+    // 1. 특정 아티스트의 과거 공연 데이터 반환
+    @GetMapping("/api/artists/{artistId}/past-concerts")
+    public ResponseEntity<List<PastConcertDTO>> getPastConcerts(@PathVariable Long artistId) {
+        List<PastConcertDTO> pastConcerts = artistService.getArtistPastConcerts(artistId);
+        return ResponseEntity.ok(pastConcerts);
+    }
+
+    // 2. 외부 API를 통해 특정 아티스트 데이터 동기화
+    @PostMapping("/api/artists/{mbid}/sync")
+    public ResponseEntity<String> syncArtistData(@PathVariable String mbid) {
+        artistService.syncArtistData(mbid);
+        return ResponseEntity.ok("Artist data synced successfully");
+    }
+
+    // 특정 아티스트의 곡 랭킹 반환
+    @GetMapping("/api/artists/{artistId}/song-ranking")
+    public ResponseEntity<List<SongRankingDTO>> getSongRanking(@PathVariable Long artistId) {
+        List<SongRankingDTO> songRanking = artistService.getSongRankingByArtist(artistId);
+        return ResponseEntity.ok(songRanking);
     }
 }

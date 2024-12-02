@@ -9,7 +9,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,8 +28,7 @@ public class PastConcert {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "artist_id", nullable = false)
-    @JsonBackReference // 순환 참조 방지
-    private Artist artistId; // 아티스트 ID (Many-to-One 관계)
+    private Artist artist; // 아티스트 ID (Many-to-One 관계)
 
     @Column(name = "venue_name", nullable = false, length = 100)
     private String venueName; // 공연장 이름
@@ -39,43 +40,17 @@ public class PastConcert {
     private String country; // 국가 이름
 
     @Column(name = "date", nullable = false)
-    private LocalDateTime date; // 공연 날짜 및 시간
+    private LocalDate date; // 공연 날짜 및 시간
 
-    @OneToMany(mappedBy = "pastConcert", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JsonManagedReference // 직렬화 허용
-    private List<ConcertSetlist> setlists;
+    @OneToMany(mappedBy = "pastConcert", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ConcertSetlist> setlists = new ArrayList<>();
 
     @Builder
-    public PastConcert(Artist artistId, String venueName, String cityName, String country, LocalDateTime date) {
-        this.artistId = artistId;
+    public PastConcert(Artist artist, String venueName, String cityName, String country, LocalDate date) {
+        this.artist = artist;
         this.venueName = venueName;
         this.cityName = cityName;
         this.country = country;
         this.date = date;
     }
-
-    // PastConcert 정보 수정 메서드
-    public void updatePastConcert(String venueName, String cityName, String country, LocalDateTime date) {
-        this.venueName = venueName;
-        this.cityName = cityName;
-        this.country = country;
-        this.date = date;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        PastConcert that = (PastConcert) o;
-        return Objects.equals(pastConcertId, that.pastConcertId) &&
-                Objects.equals(date, that.date) &&
-                Objects.equals(venueName, that.venueName) &&
-                Objects.equals(cityName, that.cityName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(pastConcertId, date, venueName, cityName);
-    }
-
 }
