@@ -73,4 +73,11 @@ public class ArtistApiController {
         List<SongRankingDTO> songRanking = artistService.getSongRankingByArtist(artistId);
         return ResponseEntity.ok(songRanking);
     }
+
+    // 특정 아티스트의 과거 콘서트 셋리스트 반환
+    @GetMapping("/api/artists/{artistId}/past-setlists")
+    public ResponseEntity<List<PastConcertSetlistDTO>> getPastConcertSetlists(@PathVariable Long artistId) {
+        List<PastConcertSetlistDTO> setlists = artistService.getPastConcertSetlistsByArtist(artistId);
+        return ResponseEntity.ok(setlists);
+    }
 }

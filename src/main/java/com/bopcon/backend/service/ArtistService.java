@@ -5,10 +5,7 @@ import com.bopcon.backend.domain.Artist;
 import com.bopcon.backend.domain.ConcertSetlist;
 import com.bopcon.backend.domain.PastConcert;
 import com.bopcon.backend.domain.Song;
-import com.bopcon.backend.dto.AddArtistRequest;
-import com.bopcon.backend.dto.PastConcertDTO;
-import com.bopcon.backend.dto.SongRankingDTO;
-import com.bopcon.backend.dto.UpdateArtistRequest;
+import com.bopcon.backend.dto.*;
 import com.bopcon.backend.repository.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.EntityNotFoundException;
@@ -132,5 +129,11 @@ public class ArtistService {
     @Transactional
     public List<SongRankingDTO> getSongRankingByArtist(Long artistId) {
         return concertSetlistRepository.findSongRankingByArtistId(artistId);
+    }
+
+    // 특정 아티스트의 과거 콘서트 셋리스트 반환
+    @Transactional
+    public List<PastConcertSetlistDTO> getPastConcertSetlistsByArtist(Long artistId) {
+        return pastConcertRepository.findConcertSetlistsByArtistId(artistId);
     }
 }
