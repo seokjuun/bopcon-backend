@@ -1,13 +1,12 @@
 package com.bopcon.backend.service;
 
+import com.bopcon.backend.api.GeminiApiClient;
 import com.bopcon.backend.api.SetlistApiClient;
-import com.bopcon.backend.domain.Artist;
-import com.bopcon.backend.domain.ConcertSetlist;
-import com.bopcon.backend.domain.PastConcert;
-import com.bopcon.backend.domain.Song;
+import com.bopcon.backend.domain.*;
 import com.bopcon.backend.dto.*;
 import com.bopcon.backend.repository.*;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +29,11 @@ public class ArtistService {
     private final SongRepository songRepository;
     private final ConcertSetlistRepository concertSetlistRepository;
     private final SetlistApiClient setlistApiClient; // 외부 API 클라이언트
+    private final GeminiApiClient geminiApiClient;
+    private final PredictSetlistRepository predictSetlistRepository;
+    private final NewConcertRepository newConcertRepository;
+    private final ObjectMapper objectMapper;
+
 
     // 아티스트 추가 메서드
     @CacheEvict(value = {"allArtists", "singleArtist"}, allEntries = true)
@@ -135,5 +139,147 @@ public class ArtistService {
     @Transactional
     public List<PastConcertSetlistDTO> getPastConcertSetlistsByArtist(Long artistId) {
         return pastConcertRepository.findConcertSetlistsByArtistId(artistId);
+    }
+
+//    @Transactional
+//    public void processPredictedSetlist(Long artistId, Long newConcertId, String pastSetlistJson) {
+//        // 1. 프롬프트 생성
+//        String prompt = createPrompt(pastSetlistJson);
+//
+//        // 2. Gemini API 호출
+//        JsonNode predictedSetlistJson = geminiApiClient.generatePredictedSetlist(prompt);
+//
+//        // 3. NewConcert 가져오기
+//        NewConcert newConcert = newConcertRepository.findById(newConcertId)
+//                .orElseThrow(() -> new IllegalArgumentException("New Concert not found"));
+//        // 4. Artist 가져오기
+//        Artist artist = artistRepository.findById(artistId)
+//                .orElseThrow(() -> new IllegalArgumentException("Artist not found"));
+//        // 4. 예상 셋리스트 저장
+//        AtomicInteger orderCounter = new AtomicInteger(1);
+//        predictedSetlistJson.forEach(songNode -> {
+//            String songTitle = songNode.get("songTitle").asText();
+//
+//            // Song 매칭 및 저장
+//            Song song = songRepository.findByTitleAndArtist_ArtistId(songTitle, artistId)
+//                    .orElseGet(() -> {
+//                        Song newSong = Song.builder()
+//                                .artist(artist)
+//                                .title(songTitle)
+//                                .lyrics(null) // 초기값 null
+//                                .ytLink(null) // 초기값 null
+//                                .build();
+//                        return songRepository.save(newSong);
+//                    });
+//
+//            // PredictSetlist 저장
+//            PredictSetlist predictSetlist = PredictSetlist.builder()
+//                    .newConcert(newConcert)
+//                    .song(song)
+//                    .order(orderCounter.getAndIncrement())
+//                    .build();
+//            predictSetlistRepository.save(predictSetlist);
+//        });
+//    }
+
+    @Transactional
+    public void processPredictedSetlist(Long artistId, Long newConcertId, String pastSetlistJson) {
+        // 1. 프롬프트 생성
+        String prompt = createPrompt(pastSetlistJson);
+
+        // 2. Gemini API 호출
+        JsonNode geminiResponse = geminiApiClient.generatePredictedSetlist(prompt);
+
+        // 3. text 필드에서 JSON 추출
+        String predictedSetlistText = geminiResponse.get("candidates")
+                .get(0)
+                .get("content")
+                .get("parts")
+                .get(0)
+                .get("text")
+                .asText();
+
+        // 4. 불필요한 ```json 및 ``` 제거
+        String cleanJson = predictedSetlistText
+                .replace("```json", "")
+                .replace("```", "")
+                .trim();
+
+        // 5. JSON 파싱
+        JsonNode predictedSetlistJson;
+        try {
+            predictedSetlistJson = objectMapper.readTree(cleanJson);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse predicted setlist JSON", e);
+        }
+
+        // 6. NewConcert 가져오기
+        NewConcert newConcert = newConcertRepository.findById(newConcertId)
+                .orElseThrow(() -> new IllegalArgumentException("New Concert not found"));
+
+        // 7. 예상 셋리스트 저장
+        AtomicInteger orderCounter = new AtomicInteger(1);
+        predictedSetlistJson.forEach(songNode -> {
+            String songTitle = songNode.get("songTitle").asText();
+
+            // Song 매칭 및 저장
+            Song song = songRepository.findByTitleAndArtist_ArtistId(songTitle, artistId)
+                    .orElseGet(() -> {
+                        Song newSong = Song.builder()
+                                .artist(newConcert.getArtist()) // Artist 설정
+                                .title(songTitle)
+                                .build();
+                        return songRepository.save(newSong);
+                    });
+
+            // ConcertSetlist 저장
+            PredictSetlist predictSetlist = PredictSetlist.builder()
+                    .newConcert(newConcert)
+                    .song(song)
+                    .order(orderCounter.getAndIncrement())
+                    .build();
+            predictSetlistRepository.save(predictSetlist);
+        });
+    }
+
+    private String createPrompt(String pastSetlistJson) {
+        return """
+            당신은 "콘서트 분석 전문가 AI"입니다. 아티스트의 최근 공연 데이터를 분석하고, 트렌드, 곡 순서, 반복 빈도를 기반으로 다음 공연의 예상 셋리스트를 생성하는 것이 목표입니다.
+            아래는 아티스트의 최근 20개 공연 데이터를 JSON 형식으로 제공한 예시입니다. 이 데이터를 분석하여 다음과 같은 가정을 기반으로 예상 셋리스트를 생성하세요:
+            1. 자주 반복되는 곡은 다음 공연에도 포함될 가능성이 높습니다.
+            2. 곡의 순서는 최근 공연의 패턴을 따르되, 마지막 공연의 변화를 반영합니다.
+            3. 공연 시간은  1시간에서 2시간 내외로, 15곡에서 ~ 25곡 사이에서 조절합니다.
+            아래는 최근 공연 데이터입니다:
+            %s
+            위 데이터를 기반으로 다음 공연의 예상 셋리스트를 생성하세요. 출력 형식은  셋리스트에 대한 JSON만 제공합니다.
+            아웃풋 형식:
+            - JSON 형식의 예상 셋리스트
+            -
+                 [
+                    {
+                      "songTitle": "example01",
+                      "order": 1
+                    },
+                    {
+                      "songTitle": "example02",
+                      "order": 2
+                    },
+                    {
+                      "songTitle": "example03",
+                      "order": 3
+                    }, ...
+                 ]
+            """.formatted(pastSetlistJson.replace("\"", "\\\""));
+    }
+
+    @Transactional
+    public List<PredictSetlistDTO> getPredictedSetlist(Long newConcertId) {
+        return predictSetlistRepository.findAllByNewConcert_NewConcertId(newConcertId).stream()
+                .map(ps -> new PredictSetlistDTO(
+                        ps.getSong().getTitle(),
+                        ps.getOrder(),
+                        ps.getSong().getLyrics(),
+                        ps.getSong().getYtLink()))
+                .collect(Collectors.toList());
     }
 }

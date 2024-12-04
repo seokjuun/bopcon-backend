@@ -3,6 +3,7 @@ package com.bopcon.backend.controller;
 import com.bopcon.backend.domain.Artist;
 import com.bopcon.backend.dto.*;
 import com.bopcon.backend.service.ArtistService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ArtistApiController {
     private final ArtistService artistService;
+    private final ObjectMapper objectMapper;
 
     // 등록
     @PostMapping("/api/admin/artist")
@@ -79,5 +81,32 @@ public class ArtistApiController {
     public ResponseEntity<List<PastConcertSetlistDTO>> getPastConcertSetlists(@PathVariable Long artistId) {
         List<PastConcertSetlistDTO> setlists = artistService.getPastConcertSetlistsByArtist(artistId);
         return ResponseEntity.ok(setlists);
+    }
+    // 특정 아티스트의 내한 콘서트 예상 셋리스트 생성
+    @PostMapping("/api/artists/{artistId}/predict-setlist")
+    public ResponseEntity<String> predictSetlist(@PathVariable Long artistId,
+                                                 @RequestParam Long newConcertId) {
+        // 1. 과거 셋리스트 데이터를 내부적으로 호출
+        List<PastConcertSetlistDTO> pastSetlists = artistService.getPastConcertSetlistsByArtist(artistId);
+
+        // 2. 과거 셋리스트 데이터를 JSON으로 변환
+        String pastSetlistJson;
+        try {
+            pastSetlistJson = objectMapper.writeValueAsString(pastSetlists);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to convert past setlists to JSON", e);
+        }
+
+        // 3. 예상 셋리스트 생성 및 저장
+        artistService.processPredictedSetlist(artistId, newConcertId, pastSetlistJson);
+
+        return ResponseEntity.ok("Predicted setlist saved successfully");
+    }
+
+    // 특정 콘서트 예상 셋리스트 조회
+    @GetMapping("/api/concerts/{newConcertId}/predicted-setlist")
+    public ResponseEntity<List<PredictSetlistDTO>> getPredictedSetlist(@PathVariable Long newConcertId) {
+        List<PredictSetlistDTO> predictedSetlist = artistService.getPredictedSetlist(newConcertId);
+        return ResponseEntity.ok(predictedSetlist);
     }
 }
