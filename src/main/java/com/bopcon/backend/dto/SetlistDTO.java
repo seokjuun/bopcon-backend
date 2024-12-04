@@ -1,23 +1,28 @@
 package com.bopcon.backend.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.bopcon.backend.domain.ConcertSetlist;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
 public class SetlistDTO {
-    private int order;
-    private String songName;
-    private String ytLink; // YouTube 링크
-    private Long songId; // 고유 번호
+    private Integer order;
+    private Long concertSetlistId;
+    private Long concertId;
+    private String concertType; // "past" 또는 "new"로 구분
+    private SongDTO song;
 
-    // 기존 생성자를 유지하면서 새로운 필드들을 포함하는 생성자 추가
-    public SetlistDTO(int order, String songName, Long songId, String ytLink) {
-        this.order = order;
-        this.songName = songName;
-        this.songId = songId;
-        this.ytLink = ytLink;
+    public static SetlistDTO fromEntity(ConcertSetlist concertSetlist){
+        return new SetlistDTO(
+                concertSetlist.getOrder(),
+                concertSetlist.getConcertSetlistId(),
+                concertSetlist.getPastConcert() != null
+                    ? concertSetlist.getPastConcert().getPastConcertId()
+                        : concertSetlist.getNewConcert().getNewConcertId(),
+                concertSetlist.getPastConcert() != null ? "past" : "new",
+                SongDTO.fromEntity(concertSetlist.getSong())
+        );
     }
-
-
 }

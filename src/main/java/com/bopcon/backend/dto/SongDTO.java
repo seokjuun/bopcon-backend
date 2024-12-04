@@ -1,30 +1,25 @@
 package com.bopcon.backend.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.bopcon.backend.domain.Song;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class SongDTO {
     private Long songId;    // 곡 ID
     private String title;   // 곡 제목
-    private int count;      // 재생 횟수
+    private String lyrics;
     private String ytLink;  // YouTube 링크
 
-    public SongDTO(Long songId, String title, Integer count, String ytLink) {
-        this.songId = songId;
-        this.title = title;
-        this.count = count;
-        this.ytLink = ytLink;
-    }
-
-    public int getCount() {
-        return count;
-    }
-    public void setCount(int count) {
-        this.count = count;
+    public static SongDTO fromEntity(Song song) {
+        return new SongDTO(
+                song.getSongId(),
+                song.getTitle(),
+                song.getLyrics(),
+                song.getYtLink()
+        );
     }
 }
 
