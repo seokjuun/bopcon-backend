@@ -77,11 +77,13 @@ public class FavoriteService {
                     if (fav.getArtist() != null) {
                         response.setArtistId(fav.getArtist().getArtistId());
                         response.setArtistName(fav.getArtist().getName());
+                        response.setImgUrl(fav.getArtist().getImgUrl());
                     }
                     if (fav.getNewConcert() != null) {
                         response.setNewConcertId(fav.getNewConcert().getNewConcertId());
                         response.setNewConcertTitle(fav.getNewConcert().getTitle());
                         response.setNewConcertDate(fav.getNewConcert().getDate().toString());
+                        response.setPosterUrl(fav.getNewConcert().getPosterUrl());
                     }
                     return response;
                 })

@@ -11,7 +11,7 @@ public class AddArticleResponse {
     private final String content; // 내용
     private final String categoryType; // 카테고리 타입
     private final String artistName; // 아티스트 이름
-    private final String userName; // 작성자 이름
+    private final String nickname; // 작성자 이름
 
     public AddArticleResponse(Article article) {
         this.id = article.getId();
@@ -19,6 +19,6 @@ public class AddArticleResponse {
         this.content = article.getContent();
         this.categoryType = article.getCategoryType().name();
         this.artistName = article.getArtist().getName();
-        this.userName = article.getUser().getNickname();
+        this.nickname = article.getUser().getNickname();
     }
 }
