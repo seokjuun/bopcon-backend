@@ -16,7 +16,6 @@ public class AddArticleRequest {
     private String content;
     private Article.CategoryType categoryType; // 게시글 유형 (자유게시판 or 콘서트)
     private Long artistId; // 아티스트 ID
-    private Long userId; // 사용자 ID
     private Long newConcertId; // 콘서트 ID (카테고리가 NEW_CONCERT일 때만 필요)
 
     public Article toEntity(Artist artist, User user, NewConcert newConcert) {

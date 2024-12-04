@@ -23,9 +23,8 @@ public class BoardService {
 
 
     //글 추가 메서드
-    public Article save(AddArticleRequest request){
+    public Article save(AddArticleRequest request, User user) {
         Artist artist = artistService.findByArtistId(request.getArtistId());
-        User user = userService.findById(request.getUserId());
         NewConcert newConcert = null;
         if (request.getCategoryType() == Article.CategoryType.NEW_CONCERT) {
             newConcert = newConcertService.findByConcertId(request.getNewConcertId());
