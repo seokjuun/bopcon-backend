@@ -8,16 +8,16 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SetlistDTO {
-    private Integer order;
     private Long concertSetlistId;
+    private Integer order;
     private Long concertId;
     private String concertType; // "past" 또는 "new"로 구분
     private SongDTO song;
 
     public static SetlistDTO fromEntity(ConcertSetlist concertSetlist){
         return new SetlistDTO(
-                concertSetlist.getOrder(),
                 concertSetlist.getConcertSetlistId(),
+                concertSetlist.getOrder(),
                 concertSetlist.getPastConcert() != null
                     ? concertSetlist.getPastConcert().getPastConcertId()
                         : concertSetlist.getNewConcert().getNewConcertId(),
