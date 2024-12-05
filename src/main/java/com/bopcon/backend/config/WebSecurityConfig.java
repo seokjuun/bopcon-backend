@@ -40,7 +40,7 @@ public class WebSecurityConfig {
     @Bean
     public WebSecurityCustomizer configure() {
         return (web) -> web.ignoring()
-                .requestMatchers(toH2Console()) // h2 콘솔에 대한 요청을 필터링에서 제외
+//                .requestMatchers(toH2Console()) // h2 콘솔에 대한 요청을 필터링에서 제외
                 .requestMatchers(new AntPathRequestMatcher("/static/**")) // 정적 리소스가 있는 경로 필터링에서 제외
                 .requestMatchers(new AntPathRequestMatcher("/images/**")); // 정적 리소스가 있는 경로 필터링에서 제외
         // requestMatchers() : 특정 요청과 일치하는 url 에 대한 액세스를 설정

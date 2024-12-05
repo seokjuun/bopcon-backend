@@ -63,6 +63,16 @@ public class BoardApiController {
         return ResponseEntity.ok().body(articles);
     }
 
+    // 특정 유저 게시물 조회
+    @GetMapping("/api/articles/user/{id}")
+    public ResponseEntity<List<ArticleResponse>> findUserArticles(@PathVariable long id) {
+        List<ArticleResponse> articles = boardService.findByUser(id)
+                .stream()
+                .map(ArticleResponse::new)
+                .toList();
+        return ResponseEntity.ok().body(articles);
+
+    }
 
     // 글 삭제
     @DeleteMapping("/api/articles/{id}")

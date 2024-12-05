@@ -51,6 +51,11 @@ public class BoardService {
         return boardRepository.findByArtistArtistId(id);
     }
 
+    // 글 조회 : 유저 id 이용
+    public List<Article> findByUser(long id){
+        return boardRepository.findByUserId(id);
+    }
+
     // 글 삭제 : ID를 받은 뒤, deleteByID() 메서드로 디비에서 데이터 삭제
     public void delete(long id){
         boardRepository.deleteById(id);
