@@ -5,6 +5,7 @@ import com.bopcon.backend.domain.Artist;
 import com.bopcon.backend.domain.NewConcert;
 import com.bopcon.backend.domain.User;
 import com.bopcon.backend.dto.AddArticleRequest;
+import com.bopcon.backend.dto.ArticleResponse;
 import com.bopcon.backend.dto.UpdateArticleRequest;
 import com.bopcon.backend.repository.BoardRepository;
 import jakarta.transaction.Transactional;
@@ -52,8 +53,11 @@ public class BoardService {
     }
 
     // 글 조회 : 유저 id 이용
-    public List<Article> findByUser(long id){
-        return boardRepository.findByUserId(id);
+    public List<ArticleResponse> findArticlesByUser(User user){
+        return boardRepository.findByUserId(user.getId())
+                .stream()
+                .map(ArticleResponse::new)
+                .toList();
     }
 
     // 글 삭제 : ID를 받은 뒤, deleteByID() 메서드로 디비에서 데이터 삭제

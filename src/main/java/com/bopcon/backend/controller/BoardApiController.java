@@ -64,12 +64,13 @@ public class BoardApiController {
     }
 
     // 특정 유저 게시물 조회
-    @GetMapping("/api/articles/user/{id}")
-    public ResponseEntity<List<ArticleResponse>> findUserArticles(@PathVariable long id) {
-        List<ArticleResponse> articles = boardService.findByUser(id)
-                .stream()
-                .map(ArticleResponse::new)
-                .toList();
+    @GetMapping("/api/articles/user")
+    public ResponseEntity<List<ArticleResponse>> findUserArticles(@AuthenticationPrincipal User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User is not authenticated.");
+        }
+
+        List<ArticleResponse> articles = boardService.findArticlesByUser(user);
         return ResponseEntity.ok().body(articles);
 
     }
