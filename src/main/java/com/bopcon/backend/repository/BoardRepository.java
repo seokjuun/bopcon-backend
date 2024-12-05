@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface BoardRepository extends JpaRepository<Article, Long> {
     List<Article> findByArtistArtistId(Long id);
+
+    List<Article> findByUserId(Long id);
 }
