@@ -16,7 +16,8 @@ public class AddNewConcertRequest {
     private Long artistId;
     private String title;
     private String subTitle;
-    private LocalDate date;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private String venueName; // 공연장
     private String cityName;
     private String countryName; // ex) Republic of Korea
@@ -32,7 +33,8 @@ public class AddNewConcertRequest {
                 .artistId(artist)
                 .title(title)
                 .subTitle(subTitle)
-                .date(date)
+                .startDate(startDate)
+                .endDate(endDate)
                 .venueName(venueName)
                 .cityName(cityName)
                 .countryName(countryName)

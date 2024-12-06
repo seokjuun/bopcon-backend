@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
@@ -33,8 +34,11 @@ public class NewConcert {
     @Column(name = "sub_title", length = 100)
     private String subTitle;
 
-    @Column(name = "date", nullable = false)
-    private LocalDate date;
+    @Column(name = "start_date", nullable = false)
+    private LocalDate startDate;
+
+    @Column(name = "end_date", nullable = false)
+    private LocalDate endDate;
 
     @Column(name = "venue_name", nullable = false, length = 100)
     private String venueName; // 공연장
@@ -76,14 +80,15 @@ public class NewConcert {
     }
 
     @Builder
-    public NewConcert(Artist artistId, String title, String subTitle, LocalDate date,
+    public NewConcert(Artist artistId, String title, String subTitle, LocalDate startDate, LocalDate endDate,
                       String venueName, String cityName, String countryName,
                       String countryCode, String ticketPlatforms, String ticketUrl,
                       String posterUrl, String genre, ConcertStatus concertStatus){
         this.artist = artistId;
         this.title = title;
         this.subTitle = subTitle;
-        this.date = date;
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.venueName = venueName;
         this.cityName = cityName;
         this.countryName = countryName;
@@ -99,7 +104,8 @@ public class NewConcert {
         this.artist = artist;
         this.title = request.getTitle();
         this.subTitle = request.getSubTitle();
-        this.date = request.getDate();
+        this.startDate = request.getStartDate();
+        this.endDate = request.getEndDate();
         this.venueName = request.getVenueName();
         this.cityName = request.getCityName();
         this.countryName = request.getCountryName();

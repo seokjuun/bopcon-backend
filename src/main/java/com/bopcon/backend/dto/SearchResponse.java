@@ -16,7 +16,8 @@ public class SearchResponse {
         private final Long newConcertId;
         private final String title;
         private final String subTitle;
-        private final String date;
+        private final String startDate;
+        private final String endDate;
         private final String venueName;
         private final String cityName;
         private final String countryName;
@@ -36,7 +37,8 @@ public class SearchResponse {
             this.newConcertId = concert.getNewConcertId();
             this.title = concert.getTitle();
             this.subTitle = concert.getSubTitle();
-            this.date = concert.getDate().toString();
+            this.startDate = concert.getStartDate().toString();
+            this.endDate = concert.getEndDate().toString();
             this.venueName = concert.getVenueName();
             this.cityName = concert.getCityName();
             this.countryName = concert.getCountryName();
