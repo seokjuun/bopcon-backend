@@ -11,7 +11,8 @@ public class NewConcertSimpleResponse {
     private final Long artistId;
     private final String artistName;
     private final String title;
-    private final LocalDate date;
+    private final LocalDate startDate;
+    private final LocalDate endDate;
 
 
     public NewConcertSimpleResponse(NewConcert newConcert){
@@ -19,6 +20,7 @@ public class NewConcertSimpleResponse {
         this.artistId = newConcert.getArtist().getArtistId();
         this.artistName = newConcert.getArtist().getName();
         this.title = newConcert.getTitle();
-        this.date = newConcert.getDate();
+        this.startDate = newConcert.getStartDate();
+        this.endDate = newConcert.getEndDate();
     }
 }

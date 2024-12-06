@@ -15,7 +15,8 @@ public class NewConcertResponse {
     private Long artistId;
     private String title;
     private String subTitle;
-    private LocalDate date;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private String venueName; // 공연장
     private String cityName;
     private String countryName; // ex) Republic of Korea
@@ -33,7 +34,8 @@ public class NewConcertResponse {
                 newConcert.getArtistId() != null ? newConcert.getArtistId().getArtistId() : null, // Null 처리
                 newConcert.getTitle(),
                 newConcert.getSubTitle(),
-                newConcert.getDate(),
+                newConcert.getStartDate(),
+                newConcert.getEndDate(),
                 newConcert.getVenueName(),
                 newConcert.getCityName(),
                 newConcert.getCountryName(),
@@ -53,7 +55,8 @@ public class NewConcertResponse {
         this.artistId = newConcert.getArtistId() != null ? newConcert.getArtistId().getArtistId() : null; // Null 처리
         this.title = newConcert.getTitle();
         this.subTitle = newConcert.getSubTitle();
-        this.date = newConcert.getDate();
+        this.startDate = newConcert.getStartDate();
+        this.endDate = newConcert.getEndDate();
         this.venueName = newConcert.getVenueName();
         this.cityName = newConcert.getCityName();
         this.countryName = newConcert.getCountryName();

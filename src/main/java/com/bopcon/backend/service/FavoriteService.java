@@ -82,7 +82,8 @@ public class FavoriteService {
                     if (fav.getNewConcert() != null) {
                         response.setNewConcertId(fav.getNewConcert().getNewConcertId());
                         response.setNewConcertTitle(fav.getNewConcert().getTitle());
-                        response.setNewConcertDate(fav.getNewConcert().getDate().toString());
+                        response.setNewConcertDate(fav.getNewConcert().getStartDate().toString());
+                        response.setNewConcertDate(fav.getNewConcert().getEndDate().toString());
                         response.setPosterUrl(fav.getNewConcert().getPosterUrl());
                     }
                     return response;
