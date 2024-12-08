@@ -43,6 +43,7 @@ public class TokenProvider {
                 .setExpiration(expiry) // 내용 exp(만료일시) : expiry 멤버 변숫값 (토큰의 만료시간 설정)
                 .setSubject(user.getEmail()) // 내용 sub(토큰제목) : 유저의 이메일 (유저 식별 가능케함)
                 .claim("id", user.getId()) // 클레임 id : 유저 ID ( 클레임으로 추가하여, 토큰에서 쉽게 유저 ID를 가져올 수 있게 함)
+                .claim("roles", user.getRoles()) // roles 정보 추가
                 // 서명 : 비밀값과 함께 해시값을 HS256 방식으로 암호화
                 .signWith(SignatureAlgorithm.HS256, jwtProperties.getSecretKey())
                 .compact(); // JWT 토큰을 문자열로 직렬화하여 최종 토큰을 생성
@@ -82,10 +83,10 @@ public class TokenProvider {
                         claims.get("id", Long.class), // ID
                         claims.getSubject(), // 이메일
                         "", // 패스워드
-                        Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))
+                        Collections.singleton(new SimpleGrantedAuthority(claims.get("roles", String.class)))
                 ),
                 token,
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))
+                Collections.singleton(new SimpleGrantedAuthority(claims.get("roles", String.class)))
         );
     }
 
