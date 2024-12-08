@@ -34,6 +34,9 @@ public class User implements UserDetails {
     @Column(name = "nickname", nullable = false, unique = true)
     private String nickname;
 
+    @Column(nullable = false) // 일반 계정은 null, 관리자 계정은 'ROLE_ADMIN'
+    private String roles = "ROLE_USER";
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -42,10 +45,11 @@ public class User implements UserDetails {
 
 
     @Builder
-    public User(String email, String password, String nickname) {
+    public User(String email, String password, String nickname, String roles) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
+        this.roles = roles;
     }
 
     // 새로운 생성자 추가
@@ -53,6 +57,11 @@ public class User implements UserDetails {
         this.id = id;
         this.email = email;
         this.password = password;
+
+        // GrantedAuthority를 기반으로 roles 설정
+        if (authorities != null && !authorities.isEmpty()) {
+            this.roles = authorities.iterator().next().getAuthority(); // 첫 번째 권한을 roles에 설정
+        }
     }
 
 
@@ -74,7 +83,10 @@ public class User implements UserDetails {
     // 권한 반환
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("user"));
+        if (roles != null) {
+            return List.of(new SimpleGrantedAuthority(roles));
+        }
+        return List.of(); // 일반 계정은 빈 권한 목록 반환
     }
 
     // 사용자의 id를 반환(고유 값)

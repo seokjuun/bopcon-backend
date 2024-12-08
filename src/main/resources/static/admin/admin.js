@@ -80,7 +80,7 @@ document.getElementById('artist-form').addEventListener('submit', async (e) => {
 // 아티스트 삭제
 async function deleteArtist(artistId) {
     try {
-        const response = await fetch(`/api/artists/${artistId}`, {
+        const response = await fetch(`/api/admin/artists/${artistId}`, {
             method: 'DELETE',
             headers: getHeaders(),
         });

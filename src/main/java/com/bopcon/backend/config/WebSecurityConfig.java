@@ -5,6 +5,7 @@ import com.bopcon.backend.service.UserDetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -54,13 +55,20 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable) // CSRF 비활성화 (SPA와 JWT 사용 시 비활성화가 일반적)
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // JWT 인증 사용으로 세션 미사용
-//                .authorizeRequests(auth -> auth
-//                        .requestMatchers("/api/auth/signup", "/api/auth/login").permitAll() // 회원가입, 로그인은 인증 없이 접근 가능
-//                        .requestMatchers("/api/artists/**", "/api/new-concerts/**").permitAll()
-//                        .anyRequest().authenticated() // 나머지 요청은 인증된 사용자만 접근 가능
-//                )
                 .authorizeRequests(auth -> auth
-                        .anyRequest().permitAll() // 모든 요청 허용
+                        // 인증 없이 접근 가능한 API
+                        .requestMatchers(HttpMethod.GET, "/api/articles", "/api/articles/{id}", "/api/articles/artist/{id}").permitAll() // 글 조회는 모두 허용
+                        .requestMatchers(HttpMethod.GET, "/api/comments/article/**").permitAll() // 댓글 목록 조회는 모두 허용
+                        .requestMatchers("/api/auth/signup", "/api/auth/login", "/api/token").permitAll() // 회원가입, 로그인
+                        .requestMatchers("/api/artists/**", "/api/new-concerts/**").permitAll() // 아티스트 및 콘서트 정보 조회
+                        .requestMatchers("/api/search").permitAll() // 검색 API는 모두 허용
+                        // 인증된 사용자만 접근 가능한 API
+                        .requestMatchers(HttpMethod.POST, "/api/articles").authenticated() // 글 등록은 인증 필요
+                        .requestMatchers("/api/comments/**").authenticated() // 댓글 추가, 삭제, 수정은 인증 필요
+                        // 관리자 전용 API
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        // 그 외 모든 요청은 인증 필요
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class) // JWT 인증 필터 추가
                 .build();

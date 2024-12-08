@@ -13,6 +13,7 @@ import java.time.LocalDate;
 public class NewConcertResponse {
     private Long newConcertId;
     private Long artistId;
+    private String artistName;
     private String title;
     private String subTitle;
     private LocalDate startDate;
@@ -32,6 +33,7 @@ public class NewConcertResponse {
         return new NewConcertResponse(
                 newConcert.getNewConcertId(),
                 newConcert.getArtistId() != null ? newConcert.getArtistId().getArtistId() : null, // Null 처리
+                newConcert.getArtistId().getName(),
                 newConcert.getTitle(),
                 newConcert.getSubTitle(),
                 newConcert.getStartDate(),
@@ -52,7 +54,7 @@ public class NewConcertResponse {
     public NewConcertResponse(NewConcert newConcert) {
         this.newConcertId = newConcert.getNewConcertId();
         this.artistId = newConcert.getArtist().getArtistId(); // 처음 get 은 아티스트 객체를 가져오고 두번째는 아이드를 가져옴
-        this.artistId = newConcert.getArtistId() != null ? newConcert.getArtistId().getArtistId() : null; // Null 처리
+        this.artistName = newConcert.getArtist().getName();
         this.title = newConcert.getTitle();
         this.subTitle = newConcert.getSubTitle();
         this.startDate = newConcert.getStartDate();
