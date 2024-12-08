@@ -48,7 +48,7 @@ public class ArtistApiController {
     }
 
     // 아티스트 삭제
-    @DeleteMapping("/api/artists/{artistId}")
+    @DeleteMapping("/api/admin/artists/{artistId}")
     public ResponseEntity<Void> deleteArtist(@PathVariable long artistId) {
         artistService.delete(artistId);
 
@@ -63,7 +63,7 @@ public class ArtistApiController {
     }
 
     // 2. 외부 API를 통해 특정 아티스트 데이터 동기화
-    @PostMapping("/api/artists/{mbid}/sync")
+    @PostMapping("/api/admin/artists/{mbid}/sync")
     public ResponseEntity<String> syncArtistData(@PathVariable String mbid) {
         artistService.syncArtistData(mbid);
         return ResponseEntity.ok("Artist data synced successfully");
@@ -83,7 +83,7 @@ public class ArtistApiController {
         return ResponseEntity.ok(setlists);
     }
     // 특정 아티스트의 내한 콘서트 예상 셋리스트 생성
-    @PostMapping("/api/artists/{artistId}/predict-setlist")
+    @PostMapping("/api/admin/artists/{artistId}/predict-setlist")
     public ResponseEntity<String> predictSetlist(@PathVariable Long artistId,
                                                  @RequestParam Long newConcertId) {
         // 1. 과거 셋리스트 데이터를 내부적으로 호출
@@ -104,7 +104,7 @@ public class ArtistApiController {
     }
 
     // 특정 콘서트 예상 셋리스트 조회
-    @GetMapping("/api/concerts/{newConcertId}/predicted-setlist")
+    @GetMapping("/api/new-concerts/{newConcertId}/predicted-setlist")
     public ResponseEntity<List<PredictSetlistDTO>> getPredictedSetlist(@PathVariable Long newConcertId) {
         List<PredictSetlistDTO> predictedSetlist = artistService.getPredictedSetlist(newConcertId);
         return ResponseEntity.ok(predictedSetlist);

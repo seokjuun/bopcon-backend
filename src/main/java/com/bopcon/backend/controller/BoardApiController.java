@@ -19,6 +19,8 @@ import java.util.List;
 @RestController // HTTP Response Body 에 객체 데이터를 JSON 형식으로 반환하는 컨트롤러
 public class BoardApiController {
     private final BoardService boardService;
+
+    //글 등록
     @PostMapping("/api/articles")
     public ResponseEntity<AddArticleResponse> addArticle(
             @RequestBody AddArticleRequest request,
@@ -30,7 +32,6 @@ public class BoardApiController {
         AddArticleResponse response = new AddArticleResponse(savedArticle);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-
 
     //글 목록 조회
     @GetMapping("/api/articles")
