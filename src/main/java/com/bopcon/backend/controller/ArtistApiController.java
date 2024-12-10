@@ -10,7 +10,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.List;
 
 @RestController
@@ -21,12 +20,14 @@ public class ArtistApiController {
 
     // 등록
     @PostMapping(value = "/api/admin/artist", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Artist> addArtist(
+    public ResponseEntity<ArtistResponse> addArtist(
             @RequestPart("artist") AddArtistRequest request,
             @RequestPart(value = "file", required = false) MultipartFile file) {
         Artist savedArtist = artistService.save(request, file);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedArtist);
+        ArtistResponse response = new ArtistResponse(savedArtist); // DTO 변환
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
     // 아티스트 전체 조회
     @GetMapping("/api/artists")
     public ResponseEntity<List<ArtistResponse>> findAllArtists() {
@@ -46,12 +47,13 @@ public class ArtistApiController {
 
     // 아티스트 수정
     @PutMapping(value = "/api/admin/artists/{artistId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Artist> updateArtist(
+    public ResponseEntity<ArtistResponse> updateArtist(
             @PathVariable long artistId,
             @RequestPart("artist") UpdateArtistRequest request,
             @RequestPart(value = "file", required = false) MultipartFile file) {
         Artist updatedArtist = artistService.update(artistId, request, file);
-        return ResponseEntity.ok().body(updatedArtist);
+        ArtistResponse response = new ArtistResponse(updatedArtist); // DTO 변환
+        return ResponseEntity.ok().body(response);
     }
 
     // 아티스트 삭제
@@ -89,6 +91,7 @@ public class ArtistApiController {
         List<PastConcertSetlistDTO> setlists = artistService.getPastConcertSetlistsByArtist(artistId);
         return ResponseEntity.ok(setlists);
     }
+
     // 특정 아티스트의 내한 콘서트 예상 셋리스트 생성
     @PostMapping("/api/admin/artists/{artistId}/predict-setlist")
     public ResponseEntity<String> predictSetlist(@PathVariable Long artistId,
