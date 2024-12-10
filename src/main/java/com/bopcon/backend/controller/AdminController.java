@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
 public class AdminController {
-
     @GetMapping("/dashboard")
     public ResponseEntity<String> getDashboard() {
         return ResponseEntity.ok("Welcome to Admin Dashboard!");

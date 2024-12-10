@@ -1,11 +1,9 @@
 package com.bopcon.backend.dto;
 
-import com.bopcon.backend.domain.Artist;
 import com.bopcon.backend.domain.PastConcert;
 import lombok.Getter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Getter
 public class PastConcertResponse {

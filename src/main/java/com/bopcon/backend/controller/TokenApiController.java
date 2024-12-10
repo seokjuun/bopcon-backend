@@ -1,9 +1,9 @@
 package com.bopcon.backend.controller;
+
 import com.bopcon.backend.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import com.bopcon.backend.dto.CreateAccessTokenRequest;
 import com.bopcon.backend.dto.CreateAccessTokenResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

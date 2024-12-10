@@ -4,7 +4,6 @@ import com.bopcon.backend.domain.Artist;
 import com.bopcon.backend.domain.Favorite;
 import com.bopcon.backend.domain.NewConcert;
 import com.bopcon.backend.domain.User;
-import com.bopcon.backend.dto.FavoriteRequest;
 import com.bopcon.backend.dto.FavoriteResponse;
 import com.bopcon.backend.repository.ArtistRepository;
 import com.bopcon.backend.repository.FavoriteRepository;

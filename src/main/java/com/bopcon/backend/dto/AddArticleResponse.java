@@ -1,5 +1,4 @@
 package com.bopcon.backend.dto;
-//순환참조방지
 
 import com.bopcon.backend.domain.Article;
 import lombok.Getter;

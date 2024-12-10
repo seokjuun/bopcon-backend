@@ -1,11 +1,7 @@
 package com.bopcon.backend.dto;
 
-import com.bopcon.backend.domain.Artist;
 import com.bopcon.backend.domain.NewConcert;
 import lombok.Getter;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 public class SearchResponse {
