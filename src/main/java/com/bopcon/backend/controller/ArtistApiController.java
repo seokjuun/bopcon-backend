@@ -6,8 +6,10 @@ import com.bopcon.backend.service.ArtistService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -18,9 +20,11 @@ public class ArtistApiController {
     private final ObjectMapper objectMapper;
 
     // 등록
-    @PostMapping("/api/admin/artist")
-    public ResponseEntity<Artist> addArtist(@RequestBody AddArtistRequest request) {
-        Artist savedArtist = artistService.save(request);
+    @PostMapping(value = "/api/admin/artist", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Artist> addArtist(
+            @RequestPart("artist") AddArtistRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile file) {
+        Artist savedArtist = artistService.save(request, file);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedArtist);
     }
     // 아티스트 전체 조회
@@ -41,10 +45,13 @@ public class ArtistApiController {
     }
 
     // 아티스트 수정
-    @PutMapping("/api/admin/artists/{artistId}")
-    public ResponseEntity<Artist> updateArtist(@PathVariable long artistId, @RequestBody UpdateArtistRequest request) {
-        Artist updateArtist = artistService.update(artistId, request);
-        return ResponseEntity.ok().body(updateArtist);
+    @PutMapping(value = "/api/admin/artists/{artistId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Artist> updateArtist(
+            @PathVariable long artistId,
+            @RequestPart("artist") UpdateArtistRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile file) {
+        Artist updatedArtist = artistService.update(artistId, request, file);
+        return ResponseEntity.ok().body(updatedArtist);
     }
 
     // 아티스트 삭제

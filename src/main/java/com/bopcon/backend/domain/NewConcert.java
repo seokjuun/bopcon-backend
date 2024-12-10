@@ -57,7 +57,7 @@ public class NewConcert {
 
     @Column(name = "ticket_url", length = 255)
     private String ticketUrl;
-    @Column(name = "poster_url", length = 255)
+    @Column(name = "poster_url")
     private String posterUrl; // 포스터
     @Column(name = "genre", length = 50)
     private String genre;
