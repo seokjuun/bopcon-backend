@@ -1,6 +1,5 @@
 package com.bopcon.backend.domain;
 
-
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;

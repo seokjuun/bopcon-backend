@@ -1,6 +1,5 @@
 package com.bopcon.backend.dto;
 
-
 import com.bopcon.backend.domain.Artist;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

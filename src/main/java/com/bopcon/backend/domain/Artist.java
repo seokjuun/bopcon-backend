@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,10 +20,8 @@ public class Artist {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "artist_id", updatable = false)
     private Long artistId;
-
     @Column(name = "mbid", nullable = false)
     private String mbid;
-
     @Column(name = "name", nullable = false)
     private String name;
     @Column(name = "kr_name")
@@ -36,20 +33,17 @@ public class Artist {
     @Column(name = "media_url")
     private String mediaUrl;
 
-
-
     @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private List<Favorite> favorites = new ArrayList<>();
+    private final List<Favorite> favorites = new ArrayList<>();
 
     // PastConcert와의 연관 관계 추가
     @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PastConcert> pastConcerts = new ArrayList<>();
+    private final List<PastConcert> pastConcerts = new ArrayList<>();
 
     // Song과의 연관 관계 추가
     @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Song> songs = new ArrayList<>();
-
+    private final List<Song> songs = new ArrayList<>();
 
     @Builder // 빌더 패턴으로 객체 생성
     public Artist(String mbid, String name, String krName,String imgUrl, String snsUrl, String mediaUrl) {

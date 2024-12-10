@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RequiredArgsConstructor // final 필드나 @NotNull 이 붙은 필드들을 포함한 생성자를 자동 생성
@@ -44,7 +43,6 @@ public class BoardApiController {
         return ResponseEntity.ok()
                 .body(articles);
     }
-
 
     //글 조회
     @GetMapping("/api/articles/{id}")

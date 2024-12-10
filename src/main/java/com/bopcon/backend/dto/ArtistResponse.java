@@ -1,7 +1,6 @@
 package com.bopcon.backend.dto;
 
 import com.bopcon.backend.domain.Artist;
-import jakarta.persistence.Column;
 import lombok.Getter;
 
 @Getter

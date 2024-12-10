@@ -7,11 +7,11 @@ import java.time.LocalDateTime;
 
 @Getter
 public class CommentResponse {
-    private Long id;
-    private String content;
-    private String nickname;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private final Long id;
+    private final String content;
+    private final String nickname;
+    private final LocalDateTime createdAt;
+    private final LocalDateTime updatedAt;
 
     public CommentResponse(Comment comment) {
         this.id = comment.getId();

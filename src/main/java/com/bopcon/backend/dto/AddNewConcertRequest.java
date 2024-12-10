@@ -2,7 +2,6 @@ package com.bopcon.backend.dto;
 
 import com.bopcon.backend.domain.Artist;
 import com.bopcon.backend.domain.NewConcert;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

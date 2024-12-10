@@ -6,24 +6,19 @@ import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
-
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
 // TokenProvider : JWT 토큰을 생성하고, 검증. 토큰을 통해 인증 정보를 추출.
 public class TokenProvider {
     private final JwtProperties jwtProperties; // 필요한 설정 정보 불러옴.
-
 
     // JWT 토큰을 생성하기 위한 메서드
     public String generateToken(User user, Duration expiredAt) { // 유저정보, 토큰 만료 기간 매개변수
@@ -64,17 +59,6 @@ public class TokenProvider {
         }
     }
 
-    // 3. 토큰 기반으로 인증 정보를 가져오는 메서드 : 토큰을 기반으로 Authentication 객체를 생성
-    // Authentication 객체를 반환하여 스프링 시큐리티에서 인증을 처리할 수 있게 함
-//    public Authentication getAuthentication(String token) {
-//        log.info("Extracting authentication for token: {}", token);
-//        Claims claims = getClaims(token);
-//        log.info("Extracted claims: {}", claims);
-//        return new UsernamePasswordAuthenticationToken(
-//                new org.springframework.security.core.userdetails.User(
-//                        claims.getSubject(), "", Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))
-//                ), token, Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")));
-//    }
     // TokenProvider에서 Authentication 반환
     public Authentication getAuthentication(String token) {
         Claims claims = getClaims(token);
@@ -89,7 +73,6 @@ public class TokenProvider {
                 Collections.singleton(new SimpleGrantedAuthority(claims.get("roles", String.class)))
         );
     }
-
 
     // 4. 토큰 기반으로 유저 ID를 가져오는 메서드 : 토큰을 복호화한 후 클레임 정보를 반환받고 클레임에서 id 키로 저장된 값을 가져와 반환
     public Long getUserId(String token) { // 유저 ID를 추출할 JWT 토큰

@@ -8,7 +8,6 @@ import com.bopcon.backend.dto.LoginResponse;
 import com.bopcon.backend.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +39,6 @@ public class AuthService {
         token.update(refreshToken);
         refreshTokenRepository.save(token);
 
-        return new LoginResponse(accessToken, refreshToken, user.getNickname());
+        return new LoginResponse(accessToken, user.getNickname());
     }
 }

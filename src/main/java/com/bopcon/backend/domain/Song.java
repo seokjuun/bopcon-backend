@@ -1,15 +1,12 @@
 package com.bopcon.backend.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Getter
@@ -35,7 +32,7 @@ public class Song {
     private String ytLink; // YouTube 링크
 
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ConcertSetlist> concertSetlists = new ArrayList<>();
+    private final List<ConcertSetlist> concertSetlists = new ArrayList<>();
 
     @Builder
     public Song(Artist artist, String title, String lyrics, String ytLink) {

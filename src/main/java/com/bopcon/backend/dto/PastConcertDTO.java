@@ -1,12 +1,10 @@
 package com.bopcon.backend.dto;
 
 import com.bopcon.backend.domain.PastConcert;
-import com.bopcon.backend.dto.SetlistDTO;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 

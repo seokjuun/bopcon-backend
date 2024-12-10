@@ -1,7 +1,5 @@
 package com.bopcon.backend.dto;
 
-import com.bopcon.backend.domain.Article;
-import com.bopcon.backend.domain.NewConcert;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

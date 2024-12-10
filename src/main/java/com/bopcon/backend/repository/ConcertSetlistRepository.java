@@ -1,13 +1,8 @@
 package com.bopcon.backend.repository;
 
 import com.bopcon.backend.domain.ConcertSetlist;
-import com.bopcon.backend.domain.PastConcert;
-import com.bopcon.backend.domain.Song;
 import com.bopcon.backend.dto.SongRankingDTO;
-import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.Past;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;

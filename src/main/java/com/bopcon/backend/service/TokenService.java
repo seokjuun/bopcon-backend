@@ -1,6 +1,5 @@
 package com.bopcon.backend.service;
 
-
 import com.bopcon.backend.config.jwt.TokenProvider;
 import com.bopcon.backend.domain.User;
 import lombok.RequiredArgsConstructor;

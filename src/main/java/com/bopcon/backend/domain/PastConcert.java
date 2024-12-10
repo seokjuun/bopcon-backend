@@ -1,20 +1,14 @@
 package com.bopcon.backend.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
 
 @EntityListeners(AuditingEntityListener.class) // 엔티티의 생성 및 수정 시간을 자동으로 기록
 @Entity
@@ -43,7 +37,7 @@ public class PastConcert {
     private LocalDate date; // 공연 날짜 및 시간
 
     @OneToMany(mappedBy = "pastConcert", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ConcertSetlist> setlists = new ArrayList<>();
+    private final List<ConcertSetlist> setlists = new ArrayList<>();
 
     @Builder
     public PastConcert(Artist artist, String venueName, String cityName, String country, LocalDate date) {

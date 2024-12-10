@@ -7,9 +7,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +65,7 @@ public class NewConcert {
     private NewConcert.ConcertStatus concertStatus;
 
     @OneToMany(mappedBy = "newConcert", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Favorite> favorites = new ArrayList<>();
+    private final List<Favorite> favorites = new ArrayList<>();
 
     public Artist getArtistId() {
         return artist;

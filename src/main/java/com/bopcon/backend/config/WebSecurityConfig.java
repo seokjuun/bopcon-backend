@@ -19,9 +19,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
-
-
 @Configuration // 스프링 설정 파일임을 나타냄. 이 어노테이션 붙은 클래스를 자동으로 읽어 설정적용
 @EnableWebSecurity // 스프링 시큐리티 활성화
 @RequiredArgsConstructor // final 로 선언된 필드에 대해 생성자 자동 생성
@@ -73,7 +70,6 @@ public class WebSecurityConfig {
                 .addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class) // JWT 인증 필터 추가
                 .build();
     }
-
 
     // 7. 인증 관리자 관련 설정
     // 사용자 정보를 가져올 서비스를 재정의 하거나, 인증 방법, 예를 들어 LDAP, JDBC 기반 인증 등을 설정할 때 사용

@@ -2,20 +2,17 @@ package com.bopcon.backend.controller;
 
 import com.bopcon.backend.domain.User;
 import com.bopcon.backend.dto.FavoriteCheckResponse;
-import com.bopcon.backend.dto.FavoriteRequest;
 import com.bopcon.backend.dto.FavoriteResponse;
 import com.bopcon.backend.service.FavoriteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 public class FavoriteController {
-
     private final FavoriteService favoriteService;
 
     // 아티스트 즐겨찾기 추가
