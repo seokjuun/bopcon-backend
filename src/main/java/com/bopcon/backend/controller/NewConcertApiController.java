@@ -10,8 +10,10 @@ import com.bopcon.backend.dto.UpdateNewConcertRequest;
 import com.bopcon.backend.service.NewConcertService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,17 +23,24 @@ import java.util.List;
 public class NewConcertApiController {
     private final NewConcertService newConcertService;
     // 등록
-    @PostMapping("/api/admin/new-concert")
-    public ResponseEntity<NewConcert> addNewConcert(@RequestBody AddNewConcertRequest request) {
-        NewConcert savedNewConcert = newConcertService.save(request);
+    @PostMapping(value = "/api/admin/new-concert", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<NewConcert> addNewConcert(
+            @RequestPart("newConcert") AddNewConcertRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile file
+    ) {
+        NewConcert savedNewConcert = newConcertService.save(request, file);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedNewConcert);
     }
 
     // 수정
-    @PutMapping("/api/admin/new-concert/{concertId}")
-    public ResponseEntity<NewConcert> updateNewConcert(@PathVariable long concertId, @RequestBody UpdateNewConcertRequest request){
-        NewConcert updateNewconcert = newConcertService.update(concertId, request);
-        return ResponseEntity.ok().body(updateNewconcert); //응답 값은 body 에 담아 전송
+    @PutMapping(value = "/api/admin/new-concert/{concertId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<NewConcert> updateNewConcert(
+            @PathVariable long concertId,
+            @RequestPart("newConcert") UpdateNewConcertRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile file
+    ){
+        NewConcert updateNewConcert = newConcertService.update(concertId, request, file);
+        return ResponseEntity.ok().body(updateNewConcert);
     }
 
     // 새 콘서트 전체 조회, 장르별로 필터링 가능

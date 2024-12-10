@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,11 +34,28 @@ public class ArtistService {
     private final PredictSetlistRepository predictSetlistRepository;
     private final NewConcertRepository newConcertRepository;
     private final ObjectMapper objectMapper;
+    private final S3Service s3Service;
 
 
     // 아티스트 추가 메서드
     @CacheEvict(value = {"allArtists", "singleArtist"}, allEntries = true)
-    public Artist save(AddArtistRequest request) {  return artistRepository.save(request.toArtist());}
+    public Artist save(AddArtistRequest request, MultipartFile file) {
+        String imageUrl = null;
+        if (file != null && !file.isEmpty()) {
+            // S3 업로드 로직 호출 (예: s3Service.upload(file))
+            imageUrl = s3Service.upload(file, "artist-images");
+            // 업로드된 s3 URL을 request에 반영
+            request = new AddArtistRequest(
+                    request.getMbid(),
+                    request.getName(),
+                    request.getKrName(),
+                    imageUrl, // imgUrl 갱신
+                    request.getSnsUrl(),
+                    request.getMediaUrl()
+            );
+        }
+        return artistRepository.save(request.toArtist());
+    }
 
     // 아티스트 목록 가져오기
     @Cacheable(value = "allArtists", key = "'allArtists'")
@@ -53,11 +71,26 @@ public class ArtistService {
     // 아시트스 수정
     @Transactional
     @CacheEvict(value = {"allArtists", "singleArtist"}, allEntries = true)
-    public Artist update(long artistId, UpdateArtistRequest request) {
+    public Artist update(long artistId, UpdateArtistRequest request, MultipartFile file) {
         Artist artist = artistRepository.findById(artistId)
-                .orElseThrow(()-> new IllegalArgumentException("not found" + artistId));
+                .orElseThrow(() -> new IllegalArgumentException("not found" + artistId));
 
-        artist.updateArtist(request);
+        String imageUrl = artist.getImgUrl(); // 기존 이미지 URL
+        if (file != null && !file.isEmpty()) {
+            imageUrl = s3Service.upload(file, "artist-images");
+        }
+
+        // 갱신된 imageUrl로 request를 다시 구성
+        UpdateArtistRequest updatedRequest = new UpdateArtistRequest(
+                request.getMbid(),
+                request.getName(),
+                request.getKrName(),
+                imageUrl,
+                request.getSnsUrl(),
+                request.getMediaUrl()
+        );
+
+        artist.updateArtist(updatedRequest);
         return artist;
     }
 
