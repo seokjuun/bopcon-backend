@@ -39,6 +39,7 @@ public class AuthService {
         token.update(refreshToken);
         refreshTokenRepository.save(token);
 
-        return new LoginResponse(accessToken, user.getNickname());
+        // 사용자 ID를 포함하여 반환
+        return new LoginResponse(user.getId(),accessToken, user.getNickname());
     }
 }
