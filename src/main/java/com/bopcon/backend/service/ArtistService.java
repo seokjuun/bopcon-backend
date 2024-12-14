@@ -173,47 +173,6 @@ public class ArtistService {
         return pastConcertRepository.findConcertSetlistsByArtistId(artistId);
     }
 
-//    @Transactional
-//    public void processPredictedSetlist(Long artistId, Long newConcertId, String pastSetlistJson) {
-//        // 1. 프롬프트 생성
-//        String prompt = createPrompt(pastSetlistJson);
-//
-//        // 2. Gemini API 호출
-//        JsonNode predictedSetlistJson = geminiApiClient.generatePredictedSetlist(prompt);
-//
-//        // 3. NewConcert 가져오기
-//        NewConcert newConcert = newConcertRepository.findById(newConcertId)
-//                .orElseThrow(() -> new IllegalArgumentException("New Concert not found"));
-//        // 4. Artist 가져오기
-//        Artist artist = artistRepository.findById(artistId)
-//                .orElseThrow(() -> new IllegalArgumentException("Artist not found"));
-//        // 4. 예상 셋리스트 저장
-//        AtomicInteger orderCounter = new AtomicInteger(1);
-//        predictedSetlistJson.forEach(songNode -> {
-//            String songTitle = songNode.get("songTitle").asText();
-//
-//            // Song 매칭 및 저장
-//            Song song = songRepository.findByTitleAndArtist_ArtistId(songTitle, artistId)
-//                    .orElseGet(() -> {
-//                        Song newSong = Song.builder()
-//                                .artist(artist)
-//                                .title(songTitle)
-//                                .lyrics(null) // 초기값 null
-//                                .ytLink(null) // 초기값 null
-//                                .build();
-//                        return songRepository.save(newSong);
-//                    });
-//
-//            // PredictSetlist 저장
-//            PredictSetlist predictSetlist = PredictSetlist.builder()
-//                    .newConcert(newConcert)
-//                    .song(song)
-//                    .order(orderCounter.getAndIncrement())
-//                    .build();
-//            predictSetlistRepository.save(predictSetlist);
-//        });
-//    }
-
     @Transactional
     public void processPredictedSetlist(Long artistId, Long newConcertId, String pastSetlistJson) {
         // 1. 프롬프트 생성

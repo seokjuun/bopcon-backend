@@ -2,8 +2,8 @@ package com.bopcon.backend.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -14,17 +14,15 @@ public class SetlistApiClient {
     private final String apiKey;
 
     @Autowired
-    public SetlistApiClient(WebClient.Builder builder) {
+    public SetlistApiClient(WebClient.Builder builder, @Value("${setlist.api.key}") String apiKey) {
         this.webClient = builder
                 .baseUrl("https://api.setlist.fm/rest/1.0")
                 .build();
 
-        // .env 파일에서 API 키 읽기
-        Dotenv dotenv = Dotenv.load();
-        this.apiKey = dotenv.get("SETLIST_API_KEY");
-        if (this.apiKey == null || this.apiKey.isEmpty()) {
-            throw new IllegalStateException("API Key is not set in .env file");
+        if (apiKey == null || apiKey.isEmpty()) {
+            throw new IllegalStateException("API Key is not set in application properties or environment variables");
         }
+        this.apiKey = apiKey;
     }
 
     public JsonNode fetchSetlists(String mbid) {
@@ -33,7 +31,7 @@ public class SetlistApiClient {
                     .uri(uriBuilder -> uriBuilder
                             .path("/artist/{mbid}/setlists")
                             .build(mbid))
-                    .header("x-api-key", apiKey) // .env에서 가져온 API Key
+                    .header("x-api-key", apiKey)
                     .header("Accept", "application/json")
                     .retrieve()
                     .bodyToMono(String.class)
