@@ -12,6 +12,8 @@ public class CommentResponse {
     private final String nickname;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
+    private final Long articleId;
+    private final String articleTitle;
 
     public CommentResponse(Comment comment) {
         this.id = comment.getId();
@@ -19,5 +21,7 @@ public class CommentResponse {
         this.nickname = comment.getUser().getNickname();
         this.createdAt = comment.getCreatedAt();
         this.updatedAt = comment.getUpdatedAt();
+        this.articleId = comment.getArticle().getId();
+        this.articleTitle = comment.getArticle().getTitle();
     }
 }
